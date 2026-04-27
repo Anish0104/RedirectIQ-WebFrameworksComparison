@@ -78,6 +78,7 @@ const EMPTY_RESULTS = {
   winners: null,
   summaryTable: [],
   series: {},
+  cache_impact: null,
   graphs: []
 };
 
@@ -279,6 +280,14 @@ function buildErrorBars(summary) {
       errorRate: row.errorRate
     };
   });
+}
+
+function getGraphUrl(summary, filename) {
+  const graph = (summary.graphs || []).find(function findGraph(entry) {
+    return entry.file === filename;
+  });
+
+  return graph ? graph.url : '';
 }
 
 function WinnerCard({ label, value, detail, tone }) {
@@ -630,6 +639,26 @@ function QualitativeExplanationCard({ title, text }) {
   );
 }
 
+function GeneratedBenchmarkImageCard({ title, description, imageUrl, alt }) {
+  if (!imageUrl) {
+    return null;
+  }
+
+  return (
+    <article className="card chart-card">
+      <div className="chart-card__header">
+        <div>
+          <h2>{title}</h2>
+          <p>{description}</p>
+        </div>
+      </div>
+      <div className="generated-chart-shell">
+        <img className="generated-chart-image" src={imageUrl} alt={alt} loading="lazy" />
+      </div>
+    </article>
+  );
+}
+
 function BenchmarkResults() {
   const initialStoredSummary = readStoredSummary();
   const [summary, setSummary] = useState(initialStoredSummary || EMPTY_RESULTS);
@@ -899,6 +928,8 @@ function BenchmarkResults() {
         return Array.isArray(QUALITATIVE_SCORES[framework]);
       })
     : [];
+  const cacheImpactThroughputGraphUrl = hasData ? getGraphUrl(summary, 'cache_impact_throughput.png') : '';
+  const cacheImpactLatencyGraphUrl = hasData ? getGraphUrl(summary, 'cache_impact_latency.png') : '';
 
   return (
     <div className="page-shell">
@@ -1192,6 +1223,32 @@ function BenchmarkResults() {
                     );
                   })}
                 </div>
+              </div>
+            </section>
+
+            <section className="card section-card cache-impact-section">
+              <div className="section-card__header">
+                <div>
+                  <h2>Cache Impact</h2>
+                  <p className="cache-impact-note">
+                    The warm-cache runs reflect steady-state performance after the in-memory slug cache is populated. The cold-cache runs reflect first-hit behavior where each redirect requires a SQLite lookup. The delta between the two shows how much each framework benefits from caching.
+                  </p>
+                </div>
+              </div>
+
+              <div className="chart-grid cache-impact-grid">
+                <GeneratedBenchmarkImageCard
+                  title="Cold vs warm throughput"
+                  description="Grouped req/sec output from the dedicated cache-impact benchmark run."
+                  imageUrl={cacheImpactThroughputGraphUrl}
+                  alt="Cache impact throughput chart"
+                />
+                <GeneratedBenchmarkImageCard
+                  title="Cold vs warm tail latency"
+                  description="Grouped p99 output from the same first-hit versus steady-state comparison."
+                  imageUrl={cacheImpactLatencyGraphUrl}
+                  alt="Cache impact latency chart"
+                />
               </div>
             </section>
 

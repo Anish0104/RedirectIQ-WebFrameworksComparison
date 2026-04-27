@@ -1,6 +1,6 @@
 {
   "hasData": true,
-  "generatedAt": "2026-04-07T17:52:05.868180+00:00",
+  "generatedAt": "2026-04-27T21:31:03.440279+00:00",
   "frameworks": [
     "node",
     "flask",
@@ -290,6 +290,67 @@
       }
     ]
   },
+  "cache_impact": {
+    "concurrency": 100,
+    "frameworks": {
+      "node": {
+        "cold": {
+          "requestsSec": null,
+          "p50Ms": null,
+          "p99Ms": null,
+          "errorRate": null
+        },
+        "warm": {
+          "requestsSec": null,
+          "p50Ms": null,
+          "p99Ms": null,
+          "errorRate": null
+        }
+      },
+      "flask": {
+        "cold": {
+          "requestsSec": null,
+          "p50Ms": null,
+          "p99Ms": null,
+          "errorRate": null
+        },
+        "warm": {
+          "requestsSec": null,
+          "p50Ms": null,
+          "p99Ms": null,
+          "errorRate": null
+        }
+      },
+      "nginx": {
+        "cold": {
+          "requestsSec": null,
+          "p50Ms": null,
+          "p99Ms": null,
+          "errorRate": null
+        },
+        "warm": {
+          "requestsSec": null,
+          "p50Ms": null,
+          "p99Ms": null,
+          "errorRate": null
+        }
+      },
+      "apache": {
+        "cold": {
+          "requestsSec": null,
+          "p50Ms": null,
+          "p99Ms": null,
+          "errorRate": null
+        },
+        "warm": {
+          "requestsSec": null,
+          "p50Ms": null,
+          "p99Ms": null,
+          "errorRate": null
+        }
+      }
+    }
+  },
   "graphs": [
     {
       "file": "throughput_comparison.png",
@@ -315,6 +376,16 @@
       "file": "error_rate.png",
       "title": "Error Rate at 500 Concurrent Connections",
       "url": "/benchmark-graphs/error_rate.png"
+    },
+    {
+      "file": "cache_impact_throughput.png",
+      "title": "Cold vs Warm Cache Throughput",
+      "url": "/benchmark-graphs/cache_impact_throughput.png"
+    },
+    {
+      "file": "cache_impact_latency.png",
+      "title": "Cold vs Warm Cache Tail Latency",
+      "url": "/benchmark-graphs/cache_impact_latency.png"
     },
     {
       "file": "summary_table.png",

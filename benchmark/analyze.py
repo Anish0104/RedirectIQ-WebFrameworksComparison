@@ -29,11 +29,16 @@ FRONTEND_DIST_DIR = ROOT_DIR / "frontend" / "dist"
 FRONTEND_GRAPHS_DIRNAME = "benchmark-graphs"
 FRAMEWORKS = ["node", "flask", "nginx", "apache"]
 CONCURRENCY_LEVELS = [1, 10, 50, 100, 250, 500]
+CACHE_IMPACT_CONCURRENCY = 100
 COLORS = {
     "node": "#2563eb",
     "flask": "#db6a4d",
     "nginx": "#0f766e",
     "apache": "#7c3aed",
+}
+CACHE_MODE_COLORS = {
+    "cold": "#c8c1b7",
+    "warm": "#181614",
 }
 GRAPH_SPECS = [
     ("throughput_comparison.png", "Throughput by Framework and Concurrency Level"),
@@ -41,6 +46,8 @@ GRAPH_SPECS = [
     ("latency_scaling_curve.png", "How Tail Latency Scales with Concurrency"),
     ("throughput_scaling_curve.png", "Throughput Scaling Curve"),
     ("error_rate.png", "Error Rate at 500 Concurrent Connections"),
+    ("cache_impact_throughput.png", "Cold vs Warm Cache Throughput"),
+    ("cache_impact_latency.png", "Cold vs Warm Cache Tail Latency"),
     ("summary_table.png", "RedirectIQ Framework Benchmark Summary"),
 ]
 
@@ -193,6 +200,18 @@ def load_results():
     return data
 
 
+def load_cache_impact_results():
+    data = {}
+
+    for framework in FRAMEWORKS:
+        data[framework] = {
+            "cold": parse_wrk_metrics(RESULTS_DIR / framework / "cold_wrk.txt"),
+            "warm": parse_wrk_metrics(RESULTS_DIR / framework / "warm_wrk.txt"),
+        }
+
+    return data
+
+
 def save_throughput_comparison(data):
     figure, axis = plt.subplots(figsize=(12, 7))
     x_positions = list(range(len(CONCURRENCY_LEVELS)))
@@ -289,6 +308,64 @@ def save_error_rate(data):
     figure.tight_layout()
     figure.savefig(GRAPHS_DIR / "error_rate.png", dpi=200)
     plt.close(figure)
+
+
+def save_cache_impact_chart(cache_impact_data, metric_key, filename, title, ylabel, suffix):
+    figure, axis = plt.subplots(figsize=(12, 7))
+    x_positions = list(range(len(FRAMEWORKS)))
+    bar_width = 0.34
+    cold_heights = []
+    warm_heights = []
+    cold_labels = []
+    warm_labels = []
+
+    for framework in FRAMEWORKS:
+        cold_value = cache_impact_data[framework]["cold"][metric_key]
+        warm_value = cache_impact_data[framework]["warm"][metric_key]
+
+        cold_heights.append(0.0 if math.isnan(cold_value) else cold_value)
+        warm_heights.append(0.0 if math.isnan(warm_value) else warm_value)
+        cold_labels.append("n/a" if math.isnan(cold_value) else f"{cold_value:.2f}{suffix}")
+        warm_labels.append("n/a" if math.isnan(warm_value) else f"{warm_value:.2f}{suffix}")
+
+    cold_offsets = [position - bar_width / 2 for position in x_positions]
+    warm_offsets = [position + bar_width / 2 for position in x_positions]
+    cold_bars = axis.bar(cold_offsets, cold_heights, width=bar_width, label="Cold", color=CACHE_MODE_COLORS["cold"])
+    warm_bars = axis.bar(warm_offsets, warm_heights, width=bar_width, label="Warm", color=CACHE_MODE_COLORS["warm"])
+
+    axis.set_xticks(x_positions)
+    axis.set_xticklabels([framework.capitalize() for framework in FRAMEWORKS])
+    axis.set_ylabel(ylabel)
+    axis.set_title(title)
+    axis.legend()
+    axis.grid(axis="y", alpha=0.25)
+    axis.bar_label(cold_bars, labels=cold_labels, padding=3, fontsize=9)
+    axis.bar_label(warm_bars, labels=warm_labels, padding=3, fontsize=9)
+    figure.tight_layout()
+    figure.savefig(GRAPHS_DIR / filename, dpi=200)
+    plt.close(figure)
+
+
+def save_cache_impact_throughput(cache_impact_data):
+    save_cache_impact_chart(
+        cache_impact_data,
+        "requests_sec",
+        "cache_impact_throughput.png",
+        f"Cold vs Warm Cache Throughput (c{CACHE_IMPACT_CONCURRENCY})",
+        "Requests / Second",
+        " req/s",
+    )
+
+
+def save_cache_impact_latency(cache_impact_data):
+    save_cache_impact_chart(
+        cache_impact_data,
+        "p99_ms",
+        "cache_impact_latency.png",
+        f"Cold vs Warm Cache p99 Latency (c{CACHE_IMPACT_CONCURRENCY})",
+        "p99 Latency (ms)",
+        " ms",
+    )
 
 
 def format_metric(value, suffix=""):
@@ -411,7 +488,7 @@ def choose_winners(data):
     return throughput_winner, latency_winner, overall_winner
 
 
-def build_summary_payload(data, throughput_winner, latency_winner, overall_winner):
+def build_summary_payload(data, cache_impact_data, throughput_winner, latency_winner, overall_winner):
     summary_rows = []
     series = {}
 
@@ -469,6 +546,26 @@ def build_summary_payload(data, throughput_winner, latency_winner, overall_winne
         },
         "summaryTable": summary_rows,
         "series": series,
+        "cache_impact": {
+            "concurrency": CACHE_IMPACT_CONCURRENCY,
+            "frameworks": {
+                framework: {
+                    "cold": {
+                        "requestsSec": sanitize_number(cache_impact_data[framework]["cold"]["requests_sec"]),
+                        "p50Ms": sanitize_number(cache_impact_data[framework]["cold"]["p50_ms"]),
+                        "p99Ms": sanitize_number(cache_impact_data[framework]["cold"]["p99_ms"]),
+                        "errorRate": sanitize_number(cache_impact_data[framework]["cold"]["error_rate"]),
+                    },
+                    "warm": {
+                        "requestsSec": sanitize_number(cache_impact_data[framework]["warm"]["requests_sec"]),
+                        "p50Ms": sanitize_number(cache_impact_data[framework]["warm"]["p50_ms"]),
+                        "p99Ms": sanitize_number(cache_impact_data[framework]["warm"]["p99_ms"]),
+                        "errorRate": sanitize_number(cache_impact_data[framework]["warm"]["error_rate"]),
+                    },
+                }
+                for framework in FRAMEWORKS
+            },
+        },
         "graphs": [
             {
                 "file": filename,
@@ -489,6 +586,26 @@ def build_empty_payload():
         "winners": None,
         "summaryTable": [],
         "series": {},
+        "cache_impact": {
+            "concurrency": CACHE_IMPACT_CONCURRENCY,
+            "frameworks": {
+                framework: {
+                    "cold": {
+                        "requestsSec": None,
+                        "p50Ms": None,
+                        "p99Ms": None,
+                        "errorRate": None,
+                    },
+                    "warm": {
+                        "requestsSec": None,
+                        "p50Ms": None,
+                        "p99Ms": None,
+                        "errorRate": None,
+                    },
+                }
+                for framework in FRAMEWORKS
+            },
+        },
         "graphs": [
             {
                 "file": filename,
@@ -533,6 +650,7 @@ def publish_graph_artifacts():
 def main():
     GRAPHS_DIR.mkdir(parents=True, exist_ok=True)
     data = load_results()
+    cache_impact_data = load_cache_impact_results()
 
     if not has_any_benchmark_data(data):
         write_summary_artifacts(build_empty_payload())
@@ -555,10 +673,12 @@ def main():
     save_latency_scaling_curve(data)
     save_throughput_scaling_curve(data)
     save_error_rate(data)
+    save_cache_impact_throughput(cache_impact_data)
+    save_cache_impact_latency(cache_impact_data)
     save_summary_table(data)
 
     throughput_winner, latency_winner, overall_winner = choose_winners(data)
-    payload = build_summary_payload(data, throughput_winner, latency_winner, overall_winner)
+    payload = build_summary_payload(data, cache_impact_data, throughput_winner, latency_winner, overall_winner)
     write_summary_artifacts(payload)
     publish_graph_artifacts()
     print(f"THROUGHPUT WINNER: {throughput_winner[0]} ({throughput_winner[1]:.2f} req/s at c500)")

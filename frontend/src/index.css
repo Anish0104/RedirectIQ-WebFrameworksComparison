@@ -2784,6 +2784,32 @@ body::after {
   min-height: 320px;
 }
 
+.generated-chart-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  padding: 14px;
+  border-radius: 20px;
+  background: #fffdf8;
+  border: 1px solid rgba(24, 22, 20, 0.07);
+}
+
+.generated-chart-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.cache-impact-note {
+  margin: 0;
+}
+
+.cache-impact-grid {
+  margin-bottom: 0;
+}
+
 .qualitative-layout {
   display: grid;
   gap: 18px;
@@ -3101,6 +3127,11 @@ body::after {
   .chart-shell--qualitative {
     height: 360px;
     min-height: 360px;
+  }
+
+  .generated-chart-shell {
+    min-height: 240px;
+    padding: 10px;
   }
 
   .qualitative-legend__item {
