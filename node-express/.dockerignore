@@ -1,0 +1,8 @@
+node_modules
+npm-debug.log
+.DS_Store
+.env
+redirectiq.db
+redirectiq.db-shm
+redirectiq.db-wal
+
