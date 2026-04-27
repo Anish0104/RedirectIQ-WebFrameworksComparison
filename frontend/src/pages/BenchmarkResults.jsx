@@ -69,6 +69,30 @@ const QUALITATIVE_EXPLANATIONS = [
     text: 'Node and Flask both gave clear, readable error messages during development. Nginx and Apache failures were harder to diagnose — errors appeared as generic 502/504 responses with the actual cause buried in server logs, adding significant debugging time.'
   }
 ];
+const ERROR_BREAKDOWN_SERIES = [
+  { dataKey: 'status502', label: '502', color: '#b91c1c' },
+  { dataKey: 'status504', label: '504', color: '#dc2626' },
+  { dataKey: 'status429', label: '429', color: '#ef4444' },
+  { dataKey: 'other', label: 'Other', color: '#fca5a5' }
+];
+const ERROR_BREAKDOWN_EXPLANATIONS = [
+  {
+    framework: 'node',
+    text: "Zero errors recorded. Node's event loop queues excess requests internally and processes them without rejecting connections."
+  },
+  {
+    framework: 'flask',
+    text: 'Zero errors at tested concurrency. Gunicorn workers throttle throughput but do not drop connections under this load.'
+  },
+  {
+    framework: 'nginx',
+    text: 'High error count driven by upstream connection exhaustion. When Gunicorn worker slots fill, Nginx returns 502 Bad Gateway rather than queuing.'
+  },
+  {
+    framework: 'apache',
+    text: "Moderate errors with extreme tail latency. Apache's prefork model holds connections open in queue, causing timeouts before rejecting."
+  }
+];
 
 const EMPTY_RESULTS = {
   hasData: false,
@@ -79,6 +103,8 @@ const EMPTY_RESULTS = {
   summaryTable: [],
   series: {},
   cache_impact: null,
+  error_breakdown: null,
+  system_metrics: null,
   graphs: []
 };
 
@@ -282,6 +308,147 @@ function buildErrorBars(summary) {
   });
 }
 
+function buildErrorBreakdownBars(summary) {
+  return summary.frameworks.map(function mapFramework(framework) {
+    const counts =
+      summary.error_breakdown && typeof summary.error_breakdown === 'object'
+        ? summary.error_breakdown[framework] || {}
+        : {};
+
+    return {
+      framework,
+      frameworkLabel: getFrameworkLabel(framework),
+      status502: Number(counts['502'] || 0),
+      status504: Number(counts['504'] || 0),
+      status429: Number(counts['429'] || 0),
+      other: Number(counts.other || 0)
+    };
+  });
+}
+
+function buildSystemMetricsRows(summary) {
+  return summary.frameworks.map(function mapFramework(framework) {
+    const metrics =
+      summary.system_metrics && typeof summary.system_metrics === 'object'
+        ? summary.system_metrics[framework] || {}
+        : {};
+
+    return {
+      framework,
+      frameworkLabel: getFrameworkLabel(framework),
+      peakCpu: metrics.peak_cpu ?? null,
+      avgCpu: metrics.avg_cpu ?? null,
+      peakMemoryMb: metrics.peak_memory_mb ?? null,
+      avgMemoryMb: metrics.avg_memory_mb ?? null
+    };
+  });
+}
+
+function normalizeHistory(payload) {
+  if (!Array.isArray(payload)) {
+    return [];
+  }
+
+  return payload
+    .filter(function isValidEntry(entry) {
+      return (
+        entry &&
+        typeof entry === 'object' &&
+        entry.run_id &&
+        entry.timestamp &&
+        entry.summary &&
+        Array.isArray(entry.summary.summaryTable)
+      );
+    })
+    .sort(function sortEntries(left, right) {
+      return new Date(left.timestamp).getTime() - new Date(right.timestamp).getTime();
+    });
+}
+
+function formatHistoryChipLabel(value) {
+  if (!value) {
+    return 'Unknown run';
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleString([], {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit'
+  });
+}
+
+function buildSummaryRowLookup(summaryLike) {
+  return Object.fromEntries(
+    (summaryLike.summaryTable || []).map(function mapRow(row) {
+      return [row.framework, row];
+    })
+  );
+}
+
+function buildHistoryDeltaRows(currentSummary, comparisonRun) {
+  if (!currentSummary || !comparisonRun || !comparisonRun.summary) {
+    return [];
+  }
+
+  const currentRows = buildSummaryRowLookup(currentSummary);
+  const comparisonRows = buildSummaryRowLookup(comparisonRun.summary);
+
+  return currentSummary.frameworks.map(function mapFramework(framework) {
+    const currentRow = currentRows[framework] || {};
+    const comparisonRow = comparisonRows[framework] || {};
+
+    return {
+      framework,
+      frameworkLabel: getFrameworkLabel(framework),
+      throughputDelta:
+        typeof currentRow.bestThroughput === 'number' && typeof comparisonRow.bestThroughput === 'number'
+          ? currentRow.bestThroughput - comparisonRow.bestThroughput
+          : null,
+      latencyDelta:
+        typeof currentRow.p99At100 === 'number' && typeof comparisonRow.p99At100 === 'number'
+          ? comparisonRow.p99At100 - currentRow.p99At100
+          : null,
+      errorRateDelta:
+        typeof currentRow.errorRate === 'number' && typeof comparisonRow.errorRate === 'number'
+          ? comparisonRow.errorRate - currentRow.errorRate
+          : null
+    };
+  });
+}
+
+function formatSignedDelta(value, suffix) {
+  if (value === null || typeof value === 'undefined' || Number.isNaN(Number(value))) {
+    return '—';
+  }
+
+  const numeric = Number(value);
+  const sign = numeric > 0 ? '+' : numeric < 0 ? '-' : '';
+  return `${sign}${Math.abs(numeric).toFixed(2)}${suffix}`;
+}
+
+function getDeltaTone(value) {
+  if (value === null || typeof value === 'undefined' || Number.isNaN(Number(value))) {
+    return 'neutral';
+  }
+
+  if (Number(value) > 0) {
+    return 'positive';
+  }
+
+  if (Number(value) < 0) {
+    return 'negative';
+  }
+
+  return 'neutral';
+}
+
 function getGraphUrl(summary, filename) {
   const graph = (summary.graphs || []).find(function findGraph(entry) {
     return entry.file === filename;
@@ -418,6 +585,49 @@ function LatencyComparisonChart({ data }) {
             <Legend />
             <Bar dataKey="p50" name="p50" fill="#93c5fd" radius={[12, 12, 4, 4]} isAnimationActive={false} />
             <Bar dataKey="p99" name="p99" fill="#db6a4d" radius={[12, 12, 4, 4]} isAnimationActive={false} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </article>
+  );
+}
+
+function ErrorBreakdownChart({ data }) {
+  return (
+    <article className="card chart-card">
+      <div className="chart-card__header">
+        <div>
+          <h2>Error status counts</h2>
+          <p>
+            Each group shows how often 502, 504, 429, and uncategorized errors appeared in the
+            dedicated curl status probes.
+          </p>
+        </div>
+      </div>
+      <div className="chart-shell">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data} margin={{ top: 10, right: 12, bottom: 0, left: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(23, 32, 51, 0.12)" vertical={false} />
+            <XAxis dataKey="frameworkLabel" tickLine={false} axisLine={false} />
+            <YAxis tickFormatter={formatTick} tickLine={false} axisLine={false} width={64} />
+            <Tooltip
+              formatter={function formatTooltipValue(value) {
+                return Number(value || 0).toLocaleString();
+              }}
+            />
+            <Legend />
+            {ERROR_BREAKDOWN_SERIES.map(function renderSeries(series) {
+              return (
+                <Bar
+                  key={series.dataKey}
+                  dataKey={series.dataKey}
+                  name={series.label}
+                  fill={series.color}
+                  radius={[12, 12, 4, 4]}
+                  isAnimationActive={false}
+                />
+              );
+            })}
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -639,6 +849,18 @@ function QualitativeExplanationCard({ title, text }) {
   );
 }
 
+function ErrorBreakdownExplanationCard({ framework, text }) {
+  return (
+    <article className="card error-breakdown-card">
+      <div className="error-breakdown-card__header">
+        <span className="error-breakdown-card__eyebrow">Framework</span>
+        <strong style={{ color: getFrameworkColor(framework) }}>{getFrameworkLabel(framework)}</strong>
+      </div>
+      <p>{text}</p>
+    </article>
+  );
+}
+
 function GeneratedBenchmarkImageCard({ title, description, imageUrl, alt }) {
   if (!imageUrl) {
     return null;
@@ -662,6 +884,8 @@ function GeneratedBenchmarkImageCard({ title, description, imageUrl, alt }) {
 function BenchmarkResults() {
   const initialStoredSummary = readStoredSummary();
   const [summary, setSummary] = useState(initialStoredSummary || EMPTY_RESULTS);
+  const [historyRuns, setHistoryRuns] = useState([]);
+  const [selectedComparisonRunId, setSelectedComparisonRunId] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [healthLoading, setHealthLoading] = useState(true);
@@ -679,6 +903,28 @@ function BenchmarkResults() {
       };
     })
   );
+
+  async function refreshHistory() {
+    try {
+      const response = await fetch(`/benchmark-history.json?ts=${Date.now()}`, {
+        cache: 'no-store'
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          setHistoryRuns([]);
+          return;
+        }
+
+        throw new Error('Failed to load benchmark history');
+      }
+
+      const payload = await response.json();
+      setHistoryRuns(normalizeHistory(payload));
+    } catch {
+      setHistoryRuns([]);
+    }
+  }
 
   useEffect(function initializePage() {
     let isActive = true;
@@ -795,12 +1041,37 @@ function BenchmarkResults() {
     }
 
     fetchSummary();
+    refreshHistory();
     fetchBackendHealth();
 
     return function cleanupSummaryRequest() {
       isActive = false;
     };
   }, []);
+
+  useEffect(
+    function keepComparisonSelectionFresh() {
+      const comparisonCandidates =
+        historyRuns.length > 1 ? historyRuns.slice(0, -1).reverse() : [];
+
+      if (comparisonCandidates.length === 0) {
+        if (selectedComparisonRunId) {
+          setSelectedComparisonRunId('');
+        }
+        return;
+      }
+
+      if (
+        !selectedComparisonRunId ||
+        !comparisonCandidates.some(function hasSelectedRun(run) {
+          return run.run_id === selectedComparisonRunId;
+        })
+      ) {
+        setSelectedComparisonRunId(comparisonCandidates[0].run_id);
+      }
+    },
+    [historyRuns, selectedComparisonRunId]
+  );
 
   async function refreshSummary() {
     setLoading(true);
@@ -858,6 +1129,8 @@ function BenchmarkResults() {
     } finally {
       setLoading(false);
     }
+
+    await refreshHistory();
   }
 
   async function refreshBackendHealth() {
@@ -923,6 +1196,8 @@ function BenchmarkResults() {
   const throughputBarData = hasData ? buildThroughputBars(summary) : [];
   const latencyBarData = hasData ? buildLatencyBars(summary) : [];
   const errorBarData = hasData ? buildErrorBars(summary) : [];
+  const errorBreakdownBarData = hasData ? buildErrorBreakdownBars(summary) : [];
+  const systemMetricsRows = hasData ? buildSystemMetricsRows(summary) : [];
   const qualitativeFrameworks = hasData
     ? summary.frameworks.filter(function hasQualitativeScores(framework) {
         return Array.isArray(QUALITATIVE_SCORES[framework]);
@@ -930,6 +1205,14 @@ function BenchmarkResults() {
     : [];
   const cacheImpactThroughputGraphUrl = hasData ? getGraphUrl(summary, 'cache_impact_throughput.png') : '';
   const cacheImpactLatencyGraphUrl = hasData ? getGraphUrl(summary, 'cache_impact_latency.png') : '';
+  const systemCpuGraphUrl = hasData ? getGraphUrl(summary, 'system_cpu.png') : '';
+  const systemMemoryGraphUrl = hasData ? getGraphUrl(summary, 'system_memory.png') : '';
+  const comparisonCandidates = hasData && historyRuns.length > 1 ? historyRuns.slice(0, -1).reverse() : [];
+  const selectedComparisonRun =
+    comparisonCandidates.find(function findSelectedRun(run) {
+      return run.run_id === selectedComparisonRunId;
+    }) || comparisonCandidates[0];
+  const historyDeltaRows = hasData ? buildHistoryDeltaRows(summary, selectedComparisonRun) : [];
 
   return (
     <div className="page-shell">
@@ -1252,6 +1535,88 @@ function BenchmarkResults() {
               </div>
             </section>
 
+            <section className="card section-card error-breakdown-section">
+              <div className="section-card__header">
+                <div>
+                  <h2>Error Breakdown</h2>
+                  <p>
+                    These counts come from the dedicated curl-based status probes that run alongside
+                    the benchmark suite and capture which failures each stack actually emits.
+                  </p>
+                </div>
+              </div>
+
+              <div className="error-breakdown-layout">
+                <ErrorBreakdownChart data={errorBreakdownBarData} />
+
+                <div className="error-breakdown-card-grid">
+                  {ERROR_BREAKDOWN_EXPLANATIONS.map(function renderErrorBreakdownCard(card) {
+                    return (
+                      <ErrorBreakdownExplanationCard
+                        key={card.framework}
+                        framework={card.framework}
+                        text={card.text}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
+
+            <section className="card section-card system-metrics-section">
+              <div className="section-card__header">
+                <div>
+                  <h2>System Metrics</h2>
+                  <p>
+                    These process-level samples were captured every 500ms during each framework run so
+                    you can compare backend CPU pressure and memory growth under load.
+                  </p>
+                </div>
+              </div>
+
+              <div className="chart-grid system-metrics-grid">
+                <GeneratedBenchmarkImageCard
+                  title="CPU usage over time"
+                  description="Line chart showing backend CPU utilization throughout the benchmark run."
+                  imageUrl={systemCpuGraphUrl}
+                  alt="System CPU usage chart"
+                />
+                <GeneratedBenchmarkImageCard
+                  title="Memory usage over time"
+                  description="Line chart showing RSS memory usage across the same benchmark window."
+                  imageUrl={systemMemoryGraphUrl}
+                  alt="System memory usage chart"
+                />
+              </div>
+
+              <div className="table-wrap">
+                <table className="data-table data-table--compact">
+                  <thead>
+                    <tr>
+                      <th>Framework</th>
+                      <th>Peak CPU</th>
+                      <th>Avg CPU</th>
+                      <th>Peak Memory</th>
+                      <th>Avg Memory</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {systemMetricsRows.map(function renderRow(row) {
+                      return (
+                        <tr key={row.framework}>
+                          <td className="summary-framework">{row.frameworkLabel}</td>
+                          <td>{formatMetric(row.peakCpu, ' %')}</td>
+                          <td>{formatMetric(row.avgCpu, ' %')}</td>
+                          <td>{formatMetric(row.peakMemoryMb, ' MB')}</td>
+                          <td>{formatMetric(row.avgMemoryMb, ' MB')}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
             <section className="card section-card">
               <div className="section-card__header">
                 <div>
@@ -1271,6 +1636,74 @@ function BenchmarkResults() {
                   );
                 })}
               </div>
+            </section>
+
+            <section className="card section-card benchmark-history-section">
+              <div className="section-card__header">
+                <div>
+                  <h2>Benchmark History</h2>
+                  <p>
+                    Positive values mean the current run improved versus the selected earlier run:
+                    higher throughput, lower p99 latency, and lower error rate.
+                  </p>
+                </div>
+              </div>
+
+              {comparisonCandidates.length === 0 ? (
+                <p className="history-empty-note">Run the benchmark again to start seeing history and regressions.</p>
+              ) : (
+                <>
+                  <div className="history-chip-row" role="tablist" aria-label="Benchmark run history">
+                    {comparisonCandidates.map(function renderHistoryChip(run) {
+                      const isActive = run.run_id === selectedComparisonRun.run_id;
+
+                      return (
+                        <button
+                          key={run.run_id}
+                          type="button"
+                          className={`history-chip ${isActive ? 'history-chip--active' : ''}`}
+                          onClick={function chooseComparisonRun() {
+                            setSelectedComparisonRunId(run.run_id);
+                          }}
+                        >
+                          {formatHistoryChipLabel(run.timestamp)}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="table-wrap">
+                    <table className="data-table data-table--compact">
+                      <thead>
+                        <tr>
+                          <th>Framework</th>
+                          <th>Throughput delta</th>
+                          <th>p99 latency delta</th>
+                          <th>Error rate delta</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {historyDeltaRows.map(function renderDeltaRow(row) {
+                          return (
+                            <tr key={row.framework}>
+                              <td className="summary-framework">{row.frameworkLabel}</td>
+                              <td className={`delta-cell delta-cell--${getDeltaTone(row.throughputDelta)}`}>
+                                {formatSignedDelta(row.throughputDelta, ' req/s')}
+                              </td>
+                              <td className={`delta-cell delta-cell--${getDeltaTone(row.latencyDelta)}`}>
+                                {formatSignedDelta(row.latencyDelta, ' ms')}
+                              </td>
+                              <td className={`delta-cell delta-cell--${getDeltaTone(row.errorRateDelta)}`}>
+                                {formatSignedDelta(row.errorRateDelta, ' %')}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
             </section>
           </>
         )}

@@ -2810,6 +2810,106 @@ body::after {
   margin-bottom: 0;
 }
 
+.system-metrics-grid {
+  margin-bottom: 18px;
+}
+
+.history-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.history-chip {
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 15px;
+  background: #ffffff;
+  border: 1px solid rgba(17, 19, 21, 0.06);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 700;
+  box-shadow: none;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.history-chip:hover {
+  transform: translateY(-1px);
+  border-color: rgba(29, 78, 216, 0.18);
+}
+
+.history-chip--active {
+  background: #111315;
+  color: #ffffff;
+  border-color: #111315;
+}
+
+.history-empty-note {
+  margin: 0;
+  color: var(--muted);
+}
+
+.delta-cell {
+  font-weight: 700;
+}
+
+.delta-cell--positive {
+  color: #0f766e;
+}
+
+.delta-cell--negative {
+  color: var(--danger);
+}
+
+.delta-cell--neutral {
+  color: var(--muted);
+}
+
+.error-breakdown-layout {
+  display: grid;
+  gap: 18px;
+}
+
+.error-breakdown-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.error-breakdown-card {
+  padding: 18px;
+  background: #fffdf8;
+  border: 1px solid rgba(24, 22, 20, 0.07);
+}
+
+.error-breakdown-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.error-breakdown-card__eyebrow {
+  color: rgba(24, 22, 20, 0.52);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.error-breakdown-card strong {
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.error-breakdown-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
 .qualitative-layout {
   display: grid;
   gap: 18px;
@@ -3043,7 +3143,8 @@ body::after {
   .results-support-grid,
   .chart-grid,
   .benchmark-flow,
-  .qualitative-explanation-grid {
+  .qualitative-explanation-grid,
+  .error-breakdown-card-grid {
     grid-template-columns: 1fr;
   }
 
@@ -3087,7 +3188,8 @@ body::after {
   .details-grid--stacked,
   .support-pill-row,
   .qualitative-score-grid,
-  .qualitative-explanation-grid {
+  .qualitative-explanation-grid,
+  .error-breakdown-card-grid {
     grid-template-columns: 1fr;
   }
 
