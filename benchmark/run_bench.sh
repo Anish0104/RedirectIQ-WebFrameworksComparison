@@ -11,11 +11,19 @@ PORTS=(3001 3002 3003 3004)
 INTERNAL_PORTS=("" "" 8003 8004)
 CACHE_IMPACT_CONCURRENCY=100
 CACHE_IMPACT_DURATION="30s"
+ERROR_PROBE_REQUESTS=100
+ERROR_PROBE_CONCURRENCY=500
 RUN_ID="$(date +%s)"
 
 mkdir -p "$RESULTS_DIR/graphs"
+CURRENT_METRICS_PID=""
 
 cleanup() {
+    if [ -n "$CURRENT_METRICS_PID" ] && kill -0 "$CURRENT_METRICS_PID" >/dev/null 2>&1; then
+        kill "$CURRENT_METRICS_PID" >/dev/null 2>&1 || true
+        wait "$CURRENT_METRICS_PID" 2>/dev/null || true
+    fi
+
     rm -f "$LOCK_FILE"
 }
 
@@ -42,6 +50,9 @@ for framework in "${FRAMEWORKS[@]}"; do
         "$RESULTS_DIR/$framework"/slug.txt \
         "$RESULTS_DIR/$framework"/cold_wrk.txt \
         "$RESULTS_DIR/$framework"/warm_wrk.txt \
+        "$RESULTS_DIR/$framework"/error_breakdown.txt \
+        "$RESULTS_DIR/$framework"/metrics_*.csv \
+        "$RESULTS_DIR/$framework"/metrics_*.log \
         "$RESULTS_DIR/$framework"/restart_backend.log
 done
 
@@ -57,6 +68,12 @@ fi
 
 if ! command -v lsof >/dev/null 2>&1; then
     echo "lsof is required so benchmark/run_bench.sh can restart backends for cold-cache runs."
+    exit 1
+fi
+
+if ! python3 -c "import psutil" >/dev/null 2>&1; then
+    echo "psutil is required for benchmark/collect_metrics.py."
+    echo "Install it with: python3 -m pip install -r benchmark/requirements.txt"
     exit 1
 fi
 
@@ -136,24 +153,28 @@ restart_framework_backend() {
                 cd "$ROOT_DIR/node-express"
                 npm start
             ) >"$log_file" 2>&1 &
+            launcher_pid="$!"
             ;;
         flask)
             (
                 cd "$ROOT_DIR/python-flask"
                 bash run.sh
             ) >"$log_file" 2>&1 &
+            launcher_pid="$!"
             ;;
         nginx)
             (
                 cd "$ROOT_DIR/nginx-proxy"
                 bash run.sh
             ) >"$log_file" 2>&1 &
+            launcher_pid="$!"
             ;;
         apache)
             (
                 cd "$ROOT_DIR/apache-proxy"
                 bash run.sh
             ) >"$log_file" 2>&1 &
+            launcher_pid="$!"
             ;;
         *)
             echo "Unknown framework: $framework"
@@ -165,6 +186,8 @@ restart_framework_backend() {
         echo "Failed to restart $framework on port $public_port. See $log_file."
         exit 1
     fi
+
+    printf '%s\n' "$launcher_pid"
 }
 
 run_wrk_with_retries() {
@@ -197,6 +220,57 @@ run_wrk_with_retries() {
     if [ "$wrk_succeeded" != true ]; then
         echo "${label} wrk failed for $framework at concurrency $concurrency after retries. See $output_file."
         exit 1
+    fi
+}
+
+run_error_probe() {
+    local framework="$1"
+    local url="$2"
+    local output_file="$3"
+    local label="$4"
+
+    echo "Running error probe for $framework after $label"
+
+    seq 1 "$ERROR_PROBE_REQUESTS" | xargs -P"$ERROR_PROBE_CONCURRENCY" -I{} /bin/sh -c '
+        code="$(curl -L -s -o /dev/null -w "%{http_code}" --max-time 10 "$1" || true)"
+        printf "%s\n" "${code:-000}"
+    ' _ "$url" >>"$output_file"
+}
+
+start_metrics_collector() {
+    local framework="$1"
+    local framework_dir="$2"
+    local backend_pid="$3"
+    local output_file="$framework_dir/metrics_${framework}.csv"
+    local log_file="$framework_dir/metrics_${framework}.log"
+    local collector_pid
+
+    python3 "$ROOT_DIR/benchmark/collect_metrics.py" \
+        --pid "$backend_pid" \
+        --output "$output_file" \
+        --interval 0.5 >"$log_file" 2>&1 &
+    collector_pid="$!"
+
+    sleep 1
+
+    if ! kill -0 "$collector_pid" >/dev/null 2>&1; then
+        echo "Metrics collector failed for $framework. See $log_file."
+        exit 1
+    fi
+
+    printf '%s\n' "$collector_pid"
+}
+
+stop_metrics_collector() {
+    local collector_pid="$1"
+
+    if [ -z "$collector_pid" ]; then
+        return 0
+    fi
+
+    if kill -0 "$collector_pid" >/dev/null 2>&1; then
+        kill "$collector_pid" >/dev/null 2>&1 || true
+        wait "$collector_pid" 2>/dev/null || true
     fi
 }
 
@@ -246,23 +320,31 @@ for index in "${!FRAMEWORKS[@]}"; do
 
     cold_wrk_output="$framework_dir/cold_wrk.txt"
     warm_wrk_output="$framework_dir/warm_wrk.txt"
+    error_breakdown_output="$framework_dir/error_breakdown.txt"
     restart_log="$framework_dir/restart_backend.log"
     benchmark_url="http://127.0.0.1:${port}/${slug}"
+    backend_launcher_pid=""
+    metrics_collector_pid=""
 
     echo "Restarting $framework before cold-cache measurement so the in-memory slug cache is empty"
-    restart_framework_backend "$framework" "$port" "$internal_port" "$framework_dir" "$restart_log"
+    backend_launcher_pid="$(restart_framework_backend "$framework" "$port" "$internal_port" "$framework_dir" "$restart_log")"
+    metrics_collector_pid="$(start_metrics_collector "$framework" "$framework_dir" "$backend_launcher_pid")"
+    CURRENT_METRICS_PID="$metrics_collector_pid"
     run_wrk_with_retries "$framework" "$CACHE_IMPACT_CONCURRENCY" "$benchmark_url" "$cold_wrk_output" "cold-cache"
+    run_error_probe "$framework" "$benchmark_url" "$error_breakdown_output" "cold-cache wrk"
 
     for _ in 1 2 3 4 5; do
         curl -s -o /dev/null "$benchmark_url" || true
     done
 
     run_wrk_with_retries "$framework" "$CACHE_IMPACT_CONCURRENCY" "$benchmark_url" "$warm_wrk_output" "warm-cache"
+    run_error_probe "$framework" "$benchmark_url" "$error_breakdown_output" "warm-cache wrk"
 
     for concurrency in "${CONCURRENCY_LEVELS[@]}"; do
         wrk_output="$framework_dir/wrk_c${concurrency}.txt"
         ab_output="$framework_dir/ab_c${concurrency}.txt"
         run_wrk_with_retries "$framework" "$concurrency" "$benchmark_url" "$wrk_output" "warm-state"
+        run_error_probe "$framework" "$benchmark_url" "$error_breakdown_output" "wrk c${concurrency}"
 
         sleep 1
 
@@ -270,9 +352,13 @@ for index in "${!FRAMEWORKS[@]}"; do
         if ! ab -n 1000 -c "${concurrency}" "http://127.0.0.1:${port}/${slug}" >"$ab_output" 2>&1; then
             echo "ab failed for $framework at concurrency $concurrency. See $ab_output. Continuing." | tee -a "$ab_output"
         fi
+        run_error_probe "$framework" "$benchmark_url" "$error_breakdown_output" "ab c${concurrency}"
 
         sleep 1
     done
+
+    stop_metrics_collector "$metrics_collector_pid"
+    CURRENT_METRICS_PID=""
 done
 
 echo "Benchmarking complete. Run python benchmark/analyze.py to see results."
