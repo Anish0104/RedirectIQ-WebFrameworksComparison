@@ -133,3 +133,12 @@ redirectiq/
 - The Node.js and React implementations were provided already and remain the baseline target for parity.
 - The Nginx and Apache variants proxy to the same Flask application logic so the benchmark isolates the effect of the fronting server and request pipeline.
 - The proxy configs assume `nginx` and `apachectl` are installed locally. On this machine, `apachectl` is available and `nginx` was not installed at build time.
+
+## Running with Docker
+
+```bash
+docker compose build
+docker compose up
+```
+
+Then open `http://localhost:5173`

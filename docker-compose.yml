@@ -1,0 +1,71 @@
+services:
+  node-express:
+    build:
+      context: ./node-express
+    env_file:
+      - ./node-express/.env
+    ports:
+      - "3001:3001"
+    volumes:
+      - node-express-db:/app/data
+    networks:
+      - redirectiq-net
+
+  python-flask:
+    build:
+      context: ./python-flask
+    env_file:
+      - ./python-flask/.env
+    ports:
+      - "3002:3002"
+    volumes:
+      - python-flask-db:/app/data
+    networks:
+      - redirectiq-net
+
+  nginx-proxy:
+    build:
+      context: ./nginx-proxy
+    env_file:
+      - ./nginx-proxy/.env
+    ports:
+      - "3003:3003"
+    volumes:
+      - nginx-proxy-db:/app/data
+    networks:
+      - redirectiq-net
+
+  apache-proxy:
+    build:
+      context: ./apache-proxy
+    env_file:
+      - ./apache-proxy/.env
+    ports:
+      - "3004:3004"
+    volumes:
+      - apache-proxy-db:/app/data
+    networks:
+      - redirectiq-net
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - node-express
+      - python-flask
+      - nginx-proxy
+      - apache-proxy
+    networks:
+      - redirectiq-net
+
+networks:
+  redirectiq-net:
+    name: redirectiq-net
+
+volumes:
+  node-express-db:
+  python-flask-db:
+  nginx-proxy-db:
+  apache-proxy-db:
