@@ -1,0 +1,1010 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis
+} from 'recharts';
+import Navbar from '../components/Navbar';
+
+const FRAMEWORK_LABELS = {
+  node: 'Node',
+  flask: 'Flask',
+  nginx: 'Nginx',
+  apache: 'Apache'
+};
+
+const FRAMEWORK_COLORS = {
+  node: '#2563eb',
+  flask: '#db6a4d',
+  nginx: '#0f766e',
+  apache: '#7c3aed'
+};
+
+const BACKEND_TARGETS = [
+  { id: 'node', label: 'Node', port: 3001 },
+  { id: 'flask', label: 'Flask', port: 3002 },
+  { id: 'nginx', label: 'Nginx', port: 3003 },
+  { id: 'apache', label: 'Apache', port: 3004 }
+];
+
+const BENCHMARK_SUMMARY_STORAGE_KEY = 'redirectiq_benchmark_summary_v1';
+
+const EMPTY_RESULTS = {
+  hasData: false,
+  generatedAt: null,
+  frameworks: ['node', 'flask', 'nginx', 'apache'],
+  concurrencyLevels: [1, 10, 50, 100, 250, 500],
+  winners: null,
+  summaryTable: [],
+  series: {},
+  graphs: []
+};
+
+function formatTimestamp(value) {
+  if (!value) {
+    return 'Not generated yet';
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleString();
+}
+
+function formatMetric(value, suffix = '') {
+  if (value === null || typeof value === 'undefined' || Number.isNaN(Number(value))) {
+    return '—';
+  }
+
+  return `${Number(value).toFixed(2)}${suffix}`;
+}
+
+function getSummaryAgeDetails(value) {
+  if (!value) {
+    return null;
+  }
+
+  const generatedAt = new Date(value);
+
+  if (Number.isNaN(generatedAt.getTime())) {
+    return null;
+  }
+
+  const ageMs = Date.now() - generatedAt.getTime();
+
+  if (ageMs < 0) {
+    return null;
+  }
+
+  const ageHours = ageMs / (1000 * 60 * 60);
+
+  if (ageHours < 24) {
+    return null;
+  }
+
+  const ageDays = Math.floor(ageHours / 24);
+
+  return {
+    ageDays,
+    message:
+      ageDays === 1
+        ? 'The loaded benchmark summary is 1 day old.'
+        : `The loaded benchmark summary is ${ageDays} days old.`
+  };
+}
+
+function formatTick(value) {
+  if (value === null || typeof value === 'undefined' || Number.isNaN(Number(value))) {
+    return '0';
+  }
+
+  const numeric = Number(value);
+
+  if (numeric >= 1000) {
+    return `${(numeric / 1000).toFixed(1)}k`;
+  }
+
+  return `${numeric.toFixed(0)}`;
+}
+
+function buildHealthUrl(port) {
+  const hostname = window.location.hostname || 'localhost';
+  const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+
+  return `${protocol}//${hostname}:${port}/health`;
+}
+
+function normalizeSummary(payload) {
+  return {
+    ...EMPTY_RESULTS,
+    ...payload
+  };
+}
+
+function hasPersistableResults(summary) {
+  return Boolean(
+    summary &&
+      summary.hasData &&
+      summary.winners &&
+      Array.isArray(summary.summaryTable) &&
+      summary.summaryTable.length > 0
+  );
+}
+
+function readStoredSummary() {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(BENCHMARK_SUMMARY_STORAGE_KEY);
+
+    if (!raw) {
+      return null;
+    }
+
+    const parsed = normalizeSummary(JSON.parse(raw));
+    return hasPersistableResults(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function storeSummary(summary) {
+  if (typeof window === 'undefined' || !hasPersistableResults(summary)) {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(BENCHMARK_SUMMARY_STORAGE_KEY, JSON.stringify(summary));
+  } catch {
+    // Ignore storage write failures and keep the in-memory summary.
+  }
+}
+
+function getFrameworkLabel(framework) {
+  return FRAMEWORK_LABELS[framework] || framework;
+}
+
+function getFrameworkColor(framework) {
+  return FRAMEWORK_COLORS[framework] || '#172033';
+}
+
+function getSeriesPoint(summary, framework, concurrency) {
+  return (summary.series[framework] || []).find(function findPoint(point) {
+    return point.concurrency === concurrency;
+  });
+}
+
+function buildLineSeries(summary, metricKey) {
+  return summary.concurrencyLevels.map(function buildPoint(concurrency) {
+    const point = {
+      concurrency,
+      label: `c${concurrency}`
+    };
+
+    summary.frameworks.forEach(function addFrameworkMetric(framework) {
+      const seriesPoint = getSeriesPoint(summary, framework, concurrency);
+      point[framework] = seriesPoint ? seriesPoint[metricKey] : null;
+    });
+
+    return point;
+  });
+}
+
+function buildThroughputBars(summary) {
+  return summary.summaryTable.map(function mapRow(row) {
+    return {
+      framework: row.framework,
+      frameworkLabel: getFrameworkLabel(row.framework),
+      value: row.bestThroughput
+    };
+  });
+}
+
+function buildLatencyBars(summary) {
+  return summary.summaryTable.map(function mapRow(row) {
+    return {
+      framework: row.framework,
+      frameworkLabel: getFrameworkLabel(row.framework),
+      p50: row.p50At100,
+      p99: row.p99At100
+    };
+  });
+}
+
+function buildErrorBars(summary) {
+  return summary.summaryTable.map(function mapRow(row) {
+    return {
+      framework: row.framework,
+      frameworkLabel: getFrameworkLabel(row.framework),
+      errorRate: row.errorRate
+    };
+  });
+}
+
+function WinnerCard({ label, value, detail, tone }) {
+  return (
+    <article className={`winner-card winner-card--${tone}`}>
+      <div className="winner-card__label">{label}</div>
+      <div className="winner-card__value">{value}</div>
+      <div className="winner-card__detail">{detail}</div>
+    </article>
+  );
+}
+
+function HealthCard({ label, port, status, timestamp, error }) {
+  return (
+    <article className={`card health-card health-card--${status}`}>
+      <div className="health-card__top">
+        <div>
+          <div className="health-card__label">{label}</div>
+          <div className="health-card__port">:{port}</div>
+        </div>
+        <div className={`health-indicator health-indicator--${status}`}>{status}</div>
+      </div>
+      <div className="health-card__meta">
+        {timestamp ? `Health timestamp: ${formatTimestamp(timestamp)}` : error || 'No response yet'}
+      </div>
+    </article>
+  );
+}
+
+function MultiFrameworkLineChart({ title, description, data, frameworks, unitSuffix }) {
+  return (
+    <article className="card chart-card">
+      <div className="chart-card__header">
+        <div>
+          <h2>{title}</h2>
+          <p>{description}</p>
+        </div>
+      </div>
+      <div className="chart-shell chart-shell--tall">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data} margin={{ top: 12, right: 16, bottom: 8, left: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(23, 32, 51, 0.12)" />
+            <XAxis dataKey="label" tickLine={false} axisLine={false} />
+            <YAxis tickFormatter={formatTick} tickLine={false} axisLine={false} width={64} />
+            <Tooltip
+              formatter={function formatTooltipValue(value) {
+                return formatMetric(value, unitSuffix);
+              }}
+              labelFormatter={function formatTooltipLabel(label) {
+                return `Concurrency ${String(label).replace('c', '')}`;
+              }}
+            />
+            <Legend />
+            {frameworks.map(function renderLine(framework) {
+              return (
+                <Line
+                  key={framework}
+                  type="monotone"
+                  dataKey={framework}
+                  name={getFrameworkLabel(framework)}
+                  stroke={getFrameworkColor(framework)}
+                  strokeWidth={3}
+                  dot={false}
+                  activeDot={{ r: 4 }}
+                  isAnimationActive={false}
+                />
+              );
+            })}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </article>
+  );
+}
+
+function SingleMetricBarChart({ title, description, data, dataKey, unitSuffix }) {
+  return (
+    <article className="card chart-card">
+      <div className="chart-card__header">
+        <div>
+          <h2>{title}</h2>
+          <p>{description}</p>
+        </div>
+      </div>
+      <div className="chart-shell">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data} margin={{ top: 10, right: 12, bottom: 0, left: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(23, 32, 51, 0.12)" vertical={false} />
+            <XAxis dataKey="frameworkLabel" tickLine={false} axisLine={false} />
+            <YAxis tickFormatter={formatTick} tickLine={false} axisLine={false} width={64} />
+            <Tooltip
+              formatter={function formatTooltipValue(value) {
+                return formatMetric(value, unitSuffix);
+              }}
+            />
+            <Bar dataKey={dataKey} radius={[12, 12, 4, 4]} isAnimationActive={false}>
+              {data.map(function renderCell(entry) {
+                return <Cell key={entry.framework} fill={getFrameworkColor(entry.framework)} />;
+              })}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </article>
+  );
+}
+
+function LatencyComparisonChart({ data }) {
+  return (
+    <article className="card chart-card">
+      <div className="chart-card__header">
+        <div>
+          <h2>Latency snapshot at concurrency 100</h2>
+          <p>Lower is better here. This pairs median latency with tail latency so spikes are visible.</p>
+        </div>
+      </div>
+      <div className="chart-shell">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data} margin={{ top: 10, right: 12, bottom: 0, left: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(23, 32, 51, 0.12)" vertical={false} />
+            <XAxis dataKey="frameworkLabel" tickLine={false} axisLine={false} />
+            <YAxis tickFormatter={formatTick} tickLine={false} axisLine={false} width={64} />
+            <Tooltip
+              formatter={function formatTooltipValue(value) {
+                return formatMetric(value, ' ms');
+              }}
+            />
+            <Legend />
+            <Bar dataKey="p50" name="p50" fill="#93c5fd" radius={[12, 12, 4, 4]} isAnimationActive={false} />
+            <Bar dataKey="p99" name="p99" fill="#db6a4d" radius={[12, 12, 4, 4]} isAnimationActive={false} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </article>
+  );
+}
+
+function BenchmarkResults() {
+  const initialStoredSummary = readStoredSummary();
+  const [summary, setSummary] = useState(initialStoredSummary || EMPTY_RESULTS);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [healthLoading, setHealthLoading] = useState(true);
+  const [copyFeedback, setCopyFeedback] = useState('');
+  const [summaryNotice, setSummaryNotice] = useState(
+    initialStoredSummary ? 'Showing your last saved benchmark run while checking for updates.' : ''
+  );
+  const [backendHealth, setBackendHealth] = useState(
+    BACKEND_TARGETS.map(function buildInitialHealth(target) {
+      return {
+        ...target,
+        status: 'checking',
+        timestamp: '',
+        error: ''
+      };
+    })
+  );
+
+  useEffect(function initializePage() {
+    let isActive = true;
+
+    async function fetchSummary() {
+      setLoading(true);
+      setError('');
+
+      try {
+        const response = await fetch(`/benchmark-summary.json?ts=${Date.now()}`, {
+          cache: 'no-store'
+        });
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            if (isActive) {
+              const cachedSummary = readStoredSummary();
+
+              if (cachedSummary) {
+                setSummary(cachedSummary);
+                setSummaryNotice('Showing your last saved benchmark run. Generate a new summary to replace it.');
+              } else {
+                setSummary(EMPTY_RESULTS);
+                setSummaryNotice('');
+              }
+            }
+
+            return;
+          }
+
+          throw new Error('Failed to load benchmark summary');
+        }
+
+        const payload = await response.json();
+        const nextSummary = normalizeSummary(payload);
+
+        if (isActive) {
+          if (hasPersistableResults(nextSummary)) {
+            setSummary(nextSummary);
+            setSummaryNotice('');
+            storeSummary(nextSummary);
+          } else {
+            const cachedSummary = readStoredSummary();
+
+            if (cachedSummary) {
+              setSummary(cachedSummary);
+              setSummaryNotice('Showing your last saved benchmark run. Generate a new summary to replace it.');
+            } else {
+              setSummary(nextSummary);
+              setSummaryNotice('');
+            }
+          }
+        }
+      } catch (requestError) {
+        if (isActive) {
+          const cachedSummary = readStoredSummary();
+
+          if (cachedSummary) {
+            setSummary(cachedSummary);
+            setSummaryNotice('Showing your last saved benchmark run because the latest summary could not be loaded.');
+          } else {
+            setError(requestError.message || 'Failed to load benchmark summary');
+          }
+        }
+      } finally {
+        if (isActive) {
+          setLoading(false);
+        }
+      }
+    }
+
+    async function fetchBackendHealth() {
+      setHealthLoading(true);
+
+      try {
+        const healthResponses = await Promise.all(
+          BACKEND_TARGETS.map(async function fetchTargetHealth(target) {
+            try {
+              const response = await fetch(buildHealthUrl(target.port), {
+                cache: 'no-store'
+              });
+
+              if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+              }
+
+              const payload = await response.json();
+
+              return {
+                ...target,
+                status: 'online',
+                timestamp: payload.timestamp || '',
+                error: ''
+              };
+            } catch (requestError) {
+              return {
+                ...target,
+                status: 'offline',
+                timestamp: '',
+                error: requestError.message || 'Unable to reach backend'
+              };
+            }
+          })
+        );
+
+        if (isActive) {
+          setBackendHealth(healthResponses);
+        }
+      } finally {
+        if (isActive) {
+          setHealthLoading(false);
+        }
+      }
+    }
+
+    fetchSummary();
+    fetchBackendHealth();
+
+    return function cleanupSummaryRequest() {
+      isActive = false;
+    };
+  }, []);
+
+  async function refreshSummary() {
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch(`/benchmark-summary.json?ts=${Date.now()}`, {
+        cache: 'no-store'
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          const cachedSummary = readStoredSummary();
+
+          if (cachedSummary) {
+            setSummary(cachedSummary);
+            setSummaryNotice('Showing your last saved benchmark run. Generate a new summary to replace it.');
+          } else {
+            setSummary(EMPTY_RESULTS);
+            setSummaryNotice('');
+          }
+          return;
+        }
+
+        throw new Error('Failed to load benchmark summary');
+      }
+
+      const payload = await response.json();
+      const nextSummary = normalizeSummary(payload);
+
+      if (hasPersistableResults(nextSummary)) {
+        setSummary(nextSummary);
+        setSummaryNotice('');
+        storeSummary(nextSummary);
+      } else {
+        const cachedSummary = readStoredSummary();
+
+        if (cachedSummary) {
+          setSummary(cachedSummary);
+          setSummaryNotice('Showing your last saved benchmark run. Generate a new summary to replace it.');
+        } else {
+          setSummary(nextSummary);
+          setSummaryNotice('');
+        }
+      }
+    } catch (requestError) {
+      const cachedSummary = readStoredSummary();
+
+      if (cachedSummary) {
+        setSummary(cachedSummary);
+        setSummaryNotice('Showing your last saved benchmark run because the latest summary could not be loaded.');
+      } else {
+        setError(requestError.message || 'Failed to load benchmark summary');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function refreshBackendHealth() {
+    setHealthLoading(true);
+
+    const healthResponses = await Promise.all(
+      BACKEND_TARGETS.map(async function fetchTargetHealth(target) {
+        try {
+          const response = await fetch(buildHealthUrl(target.port), {
+            cache: 'no-store'
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const payload = await response.json();
+
+          return {
+            ...target,
+            status: 'online',
+            timestamp: payload.timestamp || '',
+            error: ''
+          };
+        } catch (requestError) {
+          return {
+            ...target,
+            status: 'offline',
+            timestamp: '',
+            error: requestError.message || 'Unable to reach backend'
+          };
+        }
+      })
+    );
+
+    setBackendHealth(healthResponses);
+    setHealthLoading(false);
+  }
+
+  async function copyBenchmarkCommand() {
+    const command = [
+      'cd /Users/anish/Documents/redirectiq',
+      'bash benchmark/run_bench.sh',
+      'python3 benchmark/analyze.py'
+    ].join('\n');
+
+    try {
+      await navigator.clipboard.writeText(command);
+      setCopyFeedback('Benchmark commands copied to your clipboard.');
+    } catch {
+      setCopyFeedback('Clipboard access failed. Run the commands shown on this page in your terminal.');
+    }
+
+    window.setTimeout(function clearFeedback() {
+      setCopyFeedback('');
+    }, 2500);
+  }
+
+  const hasData = summary.hasData && summary.winners;
+  const summaryAgeDetails = hasData ? getSummaryAgeDetails(summary.generatedAt) : null;
+  const throughputLineData = hasData ? buildLineSeries(summary, 'requestsSec') : [];
+  const latencyLineData = hasData ? buildLineSeries(summary, 'p99Ms') : [];
+  const throughputBarData = hasData ? buildThroughputBars(summary) : [];
+  const latencyBarData = hasData ? buildLatencyBars(summary) : [];
+  const errorBarData = hasData ? buildErrorBars(summary) : [];
+
+  return (
+    <div className="page-shell">
+      <Navbar />
+
+      <main className="page-content">
+        <section className="results-hero card">
+          <div>
+            <div className="eyebrow">Benchmark center</div>
+            <h1>Compare the four RedirectIQ stacks under the same load.</h1>
+            <p>
+              Run the suite once, generate the analyzer output, and this page updates with winners,
+              summaries, and charts from the saved benchmark files.
+            </p>
+          </div>
+          <div className="results-hero__actions">
+            <Link to="/dashboard" className="button button--ghost">
+              Back to Dashboard
+            </Link>
+            <button type="button" className="button" onClick={copyBenchmarkCommand}>
+              Copy Benchmark Commands
+            </button>
+            <button type="button" className="button button--secondary" onClick={refreshSummary}>
+              Refresh Results
+            </button>
+            <button type="button" className="button button--ghost" onClick={refreshBackendHealth}>
+              {healthLoading ? 'Checking Backends...' : 'Refresh Backend Status'}
+            </button>
+            <a href="/benchmark-summary.json" className="button button--secondary">
+              Open Summary JSON
+            </a>
+          </div>
+        </section>
+
+        {copyFeedback ? <p className="inline-feedback">{copyFeedback}</p> : null}
+        {summaryNotice ? <p className="inline-feedback inline-feedback--soft">{summaryNotice}</p> : null}
+        {summaryAgeDetails ? (
+          <p className="inline-feedback inline-feedback--warning">
+            {summaryAgeDetails.message} Run `bash benchmark/run_bench.sh`, then `python3 benchmark/analyze.py`, and refresh this page to load newer results.
+          </p>
+        ) : null}
+        {loading && summary.hasData ? (
+          <p className="inline-feedback inline-feedback--soft">Refreshing benchmark results...</p>
+        ) : null}
+        {!loading && !hasData ? (
+          <section className="card section-card">
+            <div className="section-card__header">
+              <div>
+                <h2>No benchmark summary yet</h2>
+                <p>
+                  This page is only showing backend status and setup information because the benchmark
+                  run has not finished cleanly yet. Restart the backends, run the benchmark again, then
+                  run the analyzer and refresh this page.
+                </p>
+              </div>
+            </div>
+            <div className="command-stack">
+              <div className="command-card">
+                <div className="command-card__label">1. Restart all 4 backends</div>
+                <code>Node 3001, Flask 3002, Nginx 3003, Apache 3004</code>
+              </div>
+              <div className="command-card">
+                <div className="command-card__label">2. Run the benchmark again</div>
+                <code>bash benchmark/run_bench.sh</code>
+              </div>
+              <div className="command-card">
+                <div className="command-card__label">3. Generate the summary</div>
+                <code>python3 benchmark/analyze.py</code>
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {loading && !hasData ? (
+          <section className="card loading-card">
+            <p>Loading benchmark results...</p>
+          </section>
+        ) : error && !hasData ? (
+          <section className="card loading-card">
+            <p className="feedback feedback--error">{error}</p>
+          </section>
+        ) : !hasData ? (
+          <section className="results-empty-grid">
+            <article className="card section-card">
+              <div className="section-card__header">
+                <div>
+                  <h2>No benchmark results yet</h2>
+                  <p>Run the benchmark workflow once, then refresh this page.</p>
+                </div>
+              </div>
+              <div className="command-stack">
+                <div className="command-card">
+                  <div className="command-card__label">1. Start all backends</div>
+                  <code>node:3001, flask:3002, nginx:3003, apache:3004</code>
+                </div>
+                <div className="command-card">
+                  <div className="command-card__label">2. Run the load suite</div>
+                  <code>bash benchmark/run_bench.sh</code>
+                </div>
+                <div className="command-card">
+                  <div className="command-card__label">3. Generate graphs + summary</div>
+                  <code>python3 benchmark/analyze.py</code>
+                </div>
+              </div>
+            </article>
+
+            <article className="card section-card">
+              <div className="section-card__header">
+                <div>
+                  <h2>Where to look</h2>
+                  <p>Once analysis finishes, you can see the outputs in three places.</p>
+                </div>
+              </div>
+              <ul className="quick-list">
+                <li>`results/graphs/` contains the generated PNG charts and summary JSON.</li>
+                <li>This page will automatically show the winner cards and interactive charts after refresh.</li>
+                <li>`results/node/`, `results/flask/`, `results/nginx/`, and `results/apache/` contain raw `wrk` and `ab` outputs.</li>
+              </ul>
+            </article>
+          </section>
+        ) : (
+          <>
+            <section className="results-support-grid">
+              <article className="card support-card">
+                <div className="section-card__header">
+                  <div>
+                    <h2>Target health</h2>
+                    <p>Quick visibility into the four benchmark backends.</p>
+                  </div>
+                </div>
+                <div className="support-pill-row">
+                  {backendHealth.map(function renderTargetPill(target) {
+                    return (
+                      <div key={target.id} className={`support-pill support-pill--${target.status}`}>
+                        <span>{target.label}</span>
+                        <strong>{target.status}</strong>
+                      </div>
+                    );
+                  })}
+                </div>
+              </article>
+
+              <article className="card support-card">
+                <div className="section-card__header">
+                  <div>
+                    <h2>Quick runbook</h2>
+                    <p>Rerun the suite or open the machine-readable summary without leaving this page.</p>
+                  </div>
+                </div>
+                <div className="benchmark-panel__actions">
+                  <code>bash benchmark/run_bench.sh</code>
+                  <code>python3 benchmark/analyze.py</code>
+                </div>
+              </article>
+            </section>
+
+            <section className="winner-grid">
+              <WinnerCard
+                label="Overall winner"
+                value={getFrameworkLabel(summary.winners.overall.framework)}
+                detail="Combined throughput and latency score"
+                tone="overall"
+              />
+              <WinnerCard
+                label="Throughput winner"
+                value={getFrameworkLabel(summary.winners.throughput.framework)}
+                detail={`${formatMetric(summary.winners.throughput.value, ' req/s')} at c${summary.winners.throughput.concurrency}`}
+                tone="throughput"
+              />
+              <WinnerCard
+                label="Latency winner"
+                value={getFrameworkLabel(summary.winners.latency.framework)}
+                detail={`${formatMetric(summary.winners.latency.value, ' ms')} p99 at c${summary.winners.latency.concurrency}`}
+                tone="latency"
+              />
+            </section>
+
+            <section className="results-meta-row">
+              <div className="results-meta-chip">
+                <span>Generated</span>
+                <strong>{formatTimestamp(summary.generatedAt)}</strong>
+                {summaryAgeDetails ? <em>{summaryAgeDetails.message}</em> : null}
+              </div>
+              <div className="results-meta-chip">
+                <span>Frameworks</span>
+                <strong>{summary.frameworks.map(getFrameworkLabel).join(', ')}</strong>
+              </div>
+              <div className="results-meta-chip">
+                <span>Concurrency levels</span>
+                <strong>{summary.concurrencyLevels.join(', ')}</strong>
+              </div>
+            </section>
+
+            <section className="card section-card">
+              <div className="section-card__header">
+                <div>
+                  <h2>Summary table</h2>
+                  <p>Best throughput and key latency checkpoints for each target.</p>
+                </div>
+              </div>
+              <div className="table-wrap">
+                <table className="data-table data-table--compact">
+                  <thead>
+                    <tr>
+                      <th>Framework</th>
+                      <th>Best Throughput</th>
+                      <th>p50 @ c100</th>
+                      <th>p99 @ c100</th>
+                      <th>p99 @ c500</th>
+                      <th>Error Rate @ c500</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {summary.summaryTable.map(function renderRow(row) {
+                      return (
+                        <tr key={row.framework}>
+                          <td className="summary-framework">{getFrameworkLabel(row.framework)}</td>
+                          <td>{formatMetric(row.bestThroughput, ' req/s')}</td>
+                          <td>{formatMetric(row.p50At100, ' ms')}</td>
+                          <td>{formatMetric(row.p99At100, ' ms')}</td>
+                          <td>{formatMetric(row.p99At500, ' ms')}</td>
+                          <td>{formatMetric(row.errorRate, ' %')}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section className="chart-grid">
+              <MultiFrameworkLineChart
+                title="Throughput scaling curve"
+                description="Higher is better. This shows how many redirect requests each framework sustains as concurrency rises."
+                data={throughputLineData}
+                frameworks={summary.frameworks}
+                unitSuffix=" req/s"
+              />
+              <MultiFrameworkLineChart
+                title="Tail latency scaling curve"
+                description="Lower is better. This tracks p99 latency, which usually exposes bottlenecks first."
+                data={latencyLineData}
+                frameworks={summary.frameworks}
+                unitSuffix=" ms"
+              />
+              <SingleMetricBarChart
+                title="Best throughput by framework"
+                description="This compares the strongest req/sec each framework reached across the tested concurrency levels."
+                data={throughputBarData}
+                dataKey="value"
+                unitSuffix=" req/s"
+              />
+              <LatencyComparisonChart data={latencyBarData} />
+              <SingleMetricBarChart
+                title="Error rate at concurrency 500"
+                description="Lower is better. Any non-2xx or non-3xx responses get counted here."
+                data={errorBarData}
+                dataKey="errorRate"
+                unitSuffix=" %"
+              />
+            </section>
+
+            <section className="card section-card">
+              <div className="section-card__header">
+                <div>
+                  <h2>Generated exports</h2>
+                  <p>If you want the saved chart images or machine-readable summary, open them directly.</p>
+                </div>
+              </div>
+              <div className="export-list">
+                <a href="/benchmark-summary.json" className="export-link">
+                  benchmark-summary.json
+                </a>
+                {summary.graphs.map(function renderGraphLink(graph) {
+                  return (
+                    <a key={graph.file} href={graph.url} className="export-link">
+                      {graph.file}
+                    </a>
+                  );
+                })}
+              </div>
+            </section>
+          </>
+        )}
+
+        {!hasData ? (
+          <>
+            <section className="backend-health-grid">
+              {backendHealth.map(function renderHealthCard(target) {
+                return (
+                  <HealthCard
+                    key={target.id}
+                    label={target.label}
+                    port={target.port}
+                    status={target.status}
+                    timestamp={target.timestamp}
+                    error={target.error}
+                  />
+                );
+              })}
+            </section>
+
+            <section className="benchmark-flow">
+              <article className="card flow-card">
+                <div className="flow-card__step">1</div>
+                <h2>Setup per framework</h2>
+                <p>
+                  The script creates a user, logs in, creates a short link, and saves the slug for each
+                  target on ports 3001 through 3004.
+                </p>
+              </article>
+
+              <article className="card flow-card">
+                <div className="flow-card__step">2</div>
+                <h2>Warmup + redirect hits</h2>
+                <p>
+                  It fires warmup GET requests to `/:slug`, then runs load tools directly against that same
+                  redirect endpoint.
+                </p>
+              </article>
+
+              <article className="card flow-card">
+                <div className="flow-card__step">3</div>
+                <h2>Measure and compare</h2>
+                <p>
+                  `wrk` captures req/sec and latency, `ab` adds a second load run, and the analyzer picks
+                  throughput, latency, and overall winners.
+                </p>
+              </article>
+            </section>
+
+            <section className="benchmark-explainer">
+              <article className="card section-card">
+                <div className="section-card__header">
+                  <div>
+                    <h2>How requests are actually sent</h2>
+                    <p>These are the real request types that hit each framework during benchmarking.</p>
+                  </div>
+                </div>
+                <p className="subtle-status benchmark-note">
+                  The browser cannot safely execute your local shell scripts directly, so this page gives
+                  you copy and refresh controls while the actual load test still runs from your terminal.
+                </p>
+                <div className="command-stack">
+                  <div className="command-card">
+                    <div className="command-card__label">Create benchmark identity</div>
+                    <code>curl -X POST http://127.0.0.1:3001/auth/register</code>
+                    <code>curl -X POST http://127.0.0.1:3001/auth/login</code>
+                    <code>curl -X POST http://127.0.0.1:3001/links</code>
+                  </div>
+                  <div className="command-card">
+                    <div className="command-card__label">Primary traffic test with wrk</div>
+                    <code>wrk -t4 -c100 -d30s --latency http://127.0.0.1:3001/&lt;slug&gt;</code>
+                  </div>
+                  <div className="command-card">
+                    <div className="command-card__label">Secondary traffic test with ab</div>
+                    <code>ab -n 1000 -c 100 http://127.0.0.1:3001/&lt;slug&gt;</code>
+                  </div>
+                </div>
+                <ul className="quick-list">
+                  <li>`benchmark/run_bench.sh` loops through `node`, `flask`, `nginx`, and `apache`.</li>
+                  <li>Each framework gets its own user, token, slug, warmup hits, and concurrency runs.</li>
+                  <li>The main endpoint being stress-tested is `GET /:slug`, which exercises redirect logic and click logging.</li>
+                </ul>
+              </article>
+            </section>
+          </>
+        ) : null}
+      </main>
+    </div>
+  );
+}
+
+export default BenchmarkResults;

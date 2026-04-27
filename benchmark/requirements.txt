@@ -1,0 +1,2 @@
+# Python dependencies for the RedirectIQ benchmark analyzer.
+matplotlib>=3.9,<4

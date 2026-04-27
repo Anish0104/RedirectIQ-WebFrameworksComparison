@@ -1,0 +1,26 @@
+.DS_Store
+
+# Node dependencies and build output
+node_modules/
+frontend/dist/
+
+# Python virtual environments and caches
+.venv/
+__pycache__/
+*.pyc
+
+# Local environment files
+.env
+
+# SQLite databases and transient files
+*.db
+*.db-shm
+*.db-wal
+
+# Runtime logs and temp directories
+logs/
+client_body_temp/
+proxy_temp/
+fastcgi_temp/
+uwsgi_temp/
+scgi_temp/

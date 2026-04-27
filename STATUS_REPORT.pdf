@@ -1,0 +1,2776 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 13 /Kids [7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R 29 0 R 31 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+6 0 obj
+<< /Length 3920 >>
+stream
+BT
+/F2 20.00 Tf
+0.08 0.08 0.08 rg
+1 0 0 1 54.00 736.00 Tm
+(RedirectIQ Status Report) Tj
+ET
+BT
+/F2 14.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 701.00 Tm
+(1. Executive Summary) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 672.00 Tm
+(RedirectIQ is a benchmark-oriented web application that implements the same URL shortener) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 657.00 Tm
+(product across four backend setups:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 633.00 Tm
+(- Node.js + Express on port 3001) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 616.00 Tm
+(- Python + Flask + Gunicorn on port 3002) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 599.00 Tm
+(- Nginx reverse proxy + Gunicorn on port 3003) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 582.00 Tm
+(- Apache reverse proxy + Gunicorn on port 3004) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 559.00 Tm
+(The project includes a shared React frontend, SQLite-backed persistence, authentication,) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 544.00 Tm
+(redirect analytics, QR generation, password-protected links, A/B split traffic, and a) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 529.00 Tm
+(benchmarking pipeline that compares throughput, latency, and error rate across frameworks.) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 505.00 Tm
+(At the time of this report, the core application flow, framework parity, benchmark runner,) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 490.00 Tm
+(analyzer, results dashboard, and UI refresh work have all been completed. A benchmark run) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 475.00 Tm
+(has already been generated, and the current overall winner is Node.) Tj
+ET
+BT
+/F2 14.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 451.00 Tm
+(2. Project Goal) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 422.00 Tm
+(The goal of RedirectIQ is to study how different HTTP stacks behave under the same) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 407.00 Tm
+(application workload. Instead of benchmarking toy endpoints, this project benchmarks a) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 392.00 Tm
+(realistic redirect product that includes:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 368.00 Tm
+(- HTTP redirect handling with 302 responses) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 351.00 Tm
+(- JWT-protected API routes) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 334.00 Tm
+(- SQLite reads and writes) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 317.00 Tm
+(- in-memory slug caching) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 300.00 Tm
+(- click logging and background geo-enrichment) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 283.00 Tm
+(- static asset serving) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 266.00 Tm
+(- reverse-proxy behavior) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 249.00 Tm
+(- frontend and backend integration) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 226.00 Tm
+(This makes the comparison more useful than a simple "hello world" benchmark because the) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 211.00 Tm
+(tested route GET /:slug exercises real application logic.) Tj
+ET
+BT
+/F2 14.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 187.00 Tm
+(3. Completed Scope) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 158.00 Tm
+(Backend implementations) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 133.00 Tm
+(Completed:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 109.00 Tm
+(- Node/Express backend) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 92.00 Tm
+(- Flask/Gunicorn backend) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 75.00 Tm
+(- Nginx + Gunicorn benchmark target) Tj
+ET
+BT
+/F1 8 Tf
+0.45 0.42 0.38 rg
+1 0 0 1 542.00 24 Tm
+(1) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 3379 >>
+stream
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 736.00 Tm
+(- Apache + Gunicorn benchmark target) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 713.00 Tm
+(All four targets expose the same RedirectIQ API behavior and run against the same conceptual) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 698.00 Tm
+(SQLite schema:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 674.00 Tm
+(- users) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 657.00 Tm
+(- links) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 640.00 Tm
+(- clicks) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 623.00 Tm
+(- sessions) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 600.00 Tm
+(Frontend) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 575.00 Tm
+(Completed:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 551.00 Tm
+(- login/register screen) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 534.00 Tm
+(- dashboard for link creation and summary metrics) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 517.00 Tm
+(- per-link analytics page) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 500.00 Tm
+(- benchmark results dashboard) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 483.00 Tm
+(- benchmark winner cards and charts) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 466.00 Tm
+(- QR preview flow) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 449.00 Tm
+(- refreshed UI shell and cleaner visual design) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 432.00 Tm
+(- stale-page restore fix so navigating away and back does not show old cached UI) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 409.00 Tm
+(Benchmark pipeline) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 384.00 Tm
+(Completed:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 360.00 Tm
+(- automated benchmark runner with wrk and ab) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 343.00 Tm
+(- realistic Locust workload definition) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 326.00 Tm
+(- analyzer that parses benchmark outputs) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 309.00 Tm
+(- graph generation with matplotlib) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 292.00 Tm
+(- machine-readable summary JSON generation) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 275.00 Tm
+(- frontend integration for benchmark summary and graphs) Tj
+ET
+BT
+/F2 14.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 252.00 Tm
+(4. Implemented Product Features) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 223.00 Tm
+(The following shared product features are implemented across the stacks:) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 199.00 Tm
+(Authentication) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 174.00 Tm
+(- user registration) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 157.00 Tm
+(- user login) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 140.00 Tm
+(- JWT issuance and validation) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 123.00 Tm
+(- protected routes for authenticated link management) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 100.00 Tm
+(Link management) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 75.00 Tm
+(- create short links) Tj
+ET
+BT
+/F1 8 Tf
+0.45 0.42 0.38 rg
+1 0 0 1 542.00 24 Tm
+(2) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 3400 >>
+stream
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 736.00 Tm
+(- custom slugs) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 719.00 Tm
+(- list links) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 702.00 Tm
+(- delete links) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 685.00 Tm
+(- activate/deactivate links) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 668.00 Tm
+(- copyable short URLs) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 645.00 Tm
+(Redirect behavior) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 620.00 Tm
+(- 302 redirects for active links) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 603.00 Tm
+(- TTL-based slug caching) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 586.00 Tm
+(- password-protected redirects) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 569.00 Tm
+(- password verification via session cookie) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 552.00 Tm
+(- expiry enforcement) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 535.00 Tm
+(- A/B split redirects using split_ratio and split_url_b) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 512.00 Tm
+(Analytics) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 487.00 Tm
+(- total click counts) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 470.00 Tm
+(- dashboard summary counts) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 453.00 Tm
+(- per-link seven-day click history) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 436.00 Tm
+(- top referrers) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 419.00 Tm
+(- device breakdown) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 402.00 Tm
+(- geographic breakdown) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 379.00 Tm
+(Utilities) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 354.00 Tm
+(- QR code generation as image/png) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 337.00 Tm
+(- health endpoint for each backend) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 320.00 Tm
+(- consistent JSON error format) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 303.00 Tm
+(- background geolocation lookup for click events) Tj
+ET
+BT
+/F2 14.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 280.00 Tm
+(5. Benchmarking Features Completed) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 251.00 Tm
+(The benchmark system is fully wired end to end.) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 227.00 Tm
+(What the benchmark script does) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 202.00 Tm
+(benchmark/run_bench.sh performs the following steps for each framework:) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 178.00 Tm
+(1. Registers a fresh benchmark user) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 160.00 Tm
+(2. Logs in and extracts a JWT) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 142.00 Tm
+(3. Creates a fresh short link) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 124.00 Tm
+(4. Saves the generated slug) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 106.00 Tm
+(5. Sends warmup redirect hits) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 88.00 Tm
+(6. Runs wrk against GET /:slug) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 70.00 Tm
+(7. Runs ab against GET /:slug) Tj
+ET
+BT
+/F1 8 Tf
+0.45 0.42 0.38 rg
+1 0 0 1 542.00 24 Tm
+(3) Tj
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Length 3202 >>
+stream
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 736.00 Tm
+(8. Saves raw outputs into results/<framework>/) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 712.00 Tm
+(Concurrency matrix) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 687.00 Tm
+(The benchmark uses these concurrency levels:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 663.00 Tm
+(- 1) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 646.00 Tm
+(- 10) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 629.00 Tm
+(- 50) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 612.00 Tm
+(- 100) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 595.00 Tm
+(- 250) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 578.00 Tm
+(- 500) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 555.00 Tm
+(Tools used) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 530.00 Tm
+(- curl for setup requests) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 513.00 Tm
+(- wrk for sustained load and latency percentiles) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 496.00 Tm
+(- ab for additional fixed-request concurrency runs) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 479.00 Tm
+(- locust for mixed-user traffic simulation) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 462.00 Tm
+(- matplotlib for graph generation) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 439.00 Tm
+(Metrics collected) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 414.00 Tm
+(- requests per second) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 397.00 Tm
+(- p50 latency) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 380.00 Tm
+(- p99 latency) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 363.00 Tm
+(- non-success response counts) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 346.00 Tm
+(- error rate at high concurrency) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 323.00 Tm
+(Analyzer outputs) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 298.00 Tm
+(benchmark/analyze.py generates:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 274.00 Tm
+(- throughput_comparison.png) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 257.00 Tm
+(- latency_p50_p99.png) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 240.00 Tm
+(- latency_scaling_curve.png) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 223.00 Tm
+(- throughput_scaling_curve.png) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 206.00 Tm
+(- error_rate.png) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 189.00 Tm
+(- summary_table.png) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 172.00 Tm
+(- benchmark-summary.json) Tj
+ET
+BT
+/F2 14.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 149.00 Tm
+(6. Current Benchmark Results) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 120.00 Tm
+(The latest generated summary is stored in results/graphs/benchmark-summary.json.) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 96.00 Tm
+(Current winners:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 72.00 Tm
+(- Throughput winner: Node with 7738.40 req/s at concurrency 500) Tj
+ET
+BT
+/F1 8 Tf
+0.45 0.42 0.38 rg
+1 0 0 1 542.00 24 Tm
+(4) Tj
+ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 12 0 R >>
+endobj
+14 0 obj
+<< /Length 3556 >>
+stream
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 736.00 Tm
+(- Latency winner: Node with 24.45 ms p99 at concurrency 100) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 719.00 Tm
+(- Overall winner: Node) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 696.00 Tm
+(Summary table from the generated benchmark:) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 672.00 Tm
+(| Framework | Best Throughput | p50 @ c100 | p99 @ c100 | p99 @ c500 | Error Rate @ c500 |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 657.00 Tm
+(| --- | ---: | ---: | ---: | ---: | ---: |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 642.00 Tm
+(| Node | 8653.73 req/s | 9.09 ms | 24.45 ms | 817.15 ms | 0.00% |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 627.00 Tm
+(| Flask | 562.24 req/s | 38.27 ms | 67.49 ms | 86.07 ms | 0.00% |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 612.00 Tm
+(| Nginx | 4358.20 req/s | 18.64 ms | 55.47 ms | 342.64 ms | 86.07% |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 597.00 Tm
+(| Apache | 562.64 req/s | 20.53 ms | 1520.00 ms | 150.98 ms | 4.95% |) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 576.00 Tm
+(Interpretation of the current run:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 552.00 Tm
+(- Node is the strongest overall performer on this machine) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 535.00 Tm
+(- Flask is stable but substantially slower) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 518.00 Tm
+(- Nginx reaches higher throughput than Flask/Apache but shows a very high error rate in this) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 504.00 Tm
+(run) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 487.00 Tm
+(- Apache is functional but has worse tail-latency behavior at some checkpoints) Tj
+ET
+BT
+/F2 14.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 464.00 Tm
+(7. Runtime Configuration) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 435.00 Tm
+(Current .env configuration:) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 411.00 Tm
+(Node) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 386.00 Tm
+(node-express/.env) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 358.00 Tm
+(PORT=3001) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 343.00 Tm
+(HOST=0.0.0.0) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 328.00 Tm
+(JWT_SECRET=supersecretkey123) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 313.00 Tm
+(DB_PATH=./redirectiq.db) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 298.00 Tm
+(CACHE_TTL_SECONDS=60) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 283.00 Tm
+(PUBLIC_BASE_URL=) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 268.00 Tm
+(BENCHMARK_MODE=true) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 243.00 Tm
+(Flask) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 218.00 Tm
+(python-flask/.env) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 190.00 Tm
+(PORT=3002) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 175.00 Tm
+(JWT_SECRET=supersecretkey123) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 160.00 Tm
+(DB_PATH=./redirectiq.db) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 145.00 Tm
+(CACHE_TTL_SECONDS=60) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 130.00 Tm
+(PUBLIC_BASE_URL=) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 115.00 Tm
+(BENCHMARK_MODE=true) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 90.00 Tm
+(Nginx) Tj
+ET
+BT
+/F1 8 Tf
+0.45 0.42 0.38 rg
+1 0 0 1 542.00 24 Tm
+(5) Tj
+ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 14 0 R >>
+endobj
+16 0 obj
+<< /Length 3302 >>
+stream
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 736.00 Tm
+(nginx-proxy/.env) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 708.00 Tm
+(PORT=8003) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 693.00 Tm
+(NGINX_PORT=3003) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 678.00 Tm
+(JWT_SECRET=supersecretkey123) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 663.00 Tm
+(DB_PATH=./redirectiq.db) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 648.00 Tm
+(CACHE_TTL_SECONDS=60) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 633.00 Tm
+(PUBLIC_BASE_URL=) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 618.00 Tm
+(BENCHMARK_MODE=true) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 593.00 Tm
+(Apache) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 568.00 Tm
+(apache-proxy/.env) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 540.00 Tm
+(PORT=8004) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 525.00 Tm
+(APACHE_PORT=3004) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 510.00 Tm
+(JWT_SECRET=supersecretkey123) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 495.00 Tm
+(DB_PATH=./redirectiq.db) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 480.00 Tm
+(CACHE_TTL_SECONDS=60) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 465.00 Tm
+(PUBLIC_BASE_URL=) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 450.00 Tm
+(BENCHMARK_MODE=true) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 425.00 Tm
+(Note:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 401.00 Tm
+(- BENCHMARK_MODE=true is currently enabled to disable rate limiting during benchmark runs) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 384.00 Tm
+(- if this is used as a normal app rather than a benchmark run, rate limiting can be re-enabled) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 370.00 Tm
+(by setting BENCHMARK_MODE=false) Tj
+ET
+BT
+/F2 14.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 347.00 Tm
+(8. How To Run The Project) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 318.00 Tm
+(Recommended local development flow) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 293.00 Tm
+(#### Terminal 1: Node backend) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 265.00 Tm
+(cd /Users/anish/Documents/redirectiq/node-express) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 250.00 Tm
+(npm install) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 235.00 Tm
+(npm start) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 210.00 Tm
+(#### Terminal 2: Flask backend) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 182.00 Tm
+(cd /Users/anish/Documents/redirectiq/python-flask) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 167.00 Tm
+(python3 -m venv .venv) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 152.00 Tm
+(source .venv/bin/activate) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 137.00 Tm
+(pip install -r requirements.txt) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 122.00 Tm
+(bash run.sh) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 97.00 Tm
+(#### Terminal 3: Nginx backend) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 69.00 Tm
+(cd /Users/anish/Documents/redirectiq/nginx-proxy) Tj
+ET
+BT
+/F1 8 Tf
+0.45 0.42 0.38 rg
+1 0 0 1 542.00 24 Tm
+(6) Tj
+ET
+endstream
+endobj
+17 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 16 0 R >>
+endobj
+18 0 obj
+<< /Length 3164 >>
+stream
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 736.00 Tm
+(python3 -m venv .venv) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 721.00 Tm
+(source .venv/bin/activate) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 706.00 Tm
+(pip install -r requirements.txt) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 691.00 Tm
+(bash run.sh) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 666.00 Tm
+(#### Terminal 4: Apache backend) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 638.00 Tm
+(cd /Users/anish/Documents/redirectiq/apache-proxy) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 623.00 Tm
+(python3 -m venv .venv) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 608.00 Tm
+(source .venv/bin/activate) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 593.00 Tm
+(pip install -r requirements.txt) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 578.00 Tm
+(bash run.sh) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 553.00 Tm
+(#### Terminal 5: Frontend) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 525.00 Tm
+(cd /Users/anish/Documents/redirectiq/frontend) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 510.00 Tm
+(npm install) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 495.00 Tm
+(npm run dev) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 470.00 Tm
+(Open:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 446.00 Tm
+(- http://localhost:5173) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 423.00 Tm
+(Frontend-only preview through a backend) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 398.00 Tm
+(If the frontend has been built, the backend targets can serve the compiled frontend from) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 383.00 Tm
+(frontend/dist.) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 359.00 Tm
+(Build the frontend:) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 331.00 Tm
+(cd /Users/anish/Documents/redirectiq/frontend) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 316.00 Tm
+(npm run build) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 291.00 Tm
+(Then start one backend and open that backend?s port.) Tj
+ET
+BT
+/F2 14.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 267.00 Tm
+(9. How To Run The Benchmark) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 238.00 Tm
+(Install benchmark tools if needed:) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 210.00 Tm
+(brew install wrk) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 195.00 Tm
+(brew install httpd) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 180.00 Tm
+(brew install nginx) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 165.00 Tm
+(python3 -m pip install matplotlib pandas locust) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 140.00 Tm
+(Run the benchmark:) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 112.00 Tm
+(cd /Users/anish/Documents/redirectiq) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 97.00 Tm
+(bash benchmark/run_bench.sh) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 82.00 Tm
+(python3 benchmark/analyze.py) Tj
+ET
+BT
+/F1 8 Tf
+0.45 0.42 0.38 rg
+1 0 0 1 542.00 24 Tm
+(7) Tj
+ET
+endstream
+endobj
+19 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 18 0 R >>
+endobj
+20 0 obj
+<< /Length 3690 >>
+stream
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 736.00 Tm
+(Outputs are written to:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 712.00 Tm
+(- results/node) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 695.00 Tm
+(- results/flask) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 678.00 Tm
+(- results/nginx) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 661.00 Tm
+(- results/apache) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 644.00 Tm
+(- results/graphs) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 621.00 Tm
+(Frontend benchmark dashboard:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 597.00 Tm
+(- http://localhost:5173/results) Tj
+ET
+BT
+/F2 14.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 574.00 Tm
+(10. API Endpoints) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 545.00 Tm
+(The project exposes these application endpoints:) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 521.00 Tm
+(| Method | Route | Purpose |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 506.00 Tm
+(| --- | --- | --- |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 491.00 Tm
+(| POST | /auth/register | Create a new user |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 476.00 Tm
+(| POST | /auth/login | Log in and return a JWT |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 461.00 Tm
+(| GET | /links | List links for the authenticated user |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 446.00 Tm
+(| POST | /links | Create a link |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 431.00 Tm
+(| GET | /links/:id/stats | View analytics for a link |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 416.00 Tm
+(| PUT | /links/:id | Update a link |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 401.00 Tm
+(| DELETE | /links/:id | Delete a link |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 386.00 Tm
+(| GET | /links/:id/qr | Generate a QR code |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 371.00 Tm
+(| GET | /stats/summary | Dashboard summary metrics |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 356.00 Tm
+(| GET | /health | Service health check |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 341.00 Tm
+(| GET | /:slug | Redirect to original URL |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 326.00 Tm
+(| POST | /verify-password/:slug | Verify password for a protected link |) Tj
+ET
+BT
+/F3 8.30 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 311.00 Tm
+(| GET | /password-prompt/:slug | Render a basic password form |) Tj
+ET
+BT
+/F2 14.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 290.00 Tm
+(11. High-Level Architecture) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 261.00 Tm
+(Shared behavior across backends) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 236.00 Tm
+(All four backends implement the same RedirectIQ logic:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 212.00 Tm
+(- auth routes) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 195.00 Tm
+(- link CRUD routes) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 178.00 Tm
+(- QR generation) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 161.00 Tm
+(- summary route) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 144.00 Tm
+(- redirect route) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 127.00 Tm
+(- click logging) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 110.00 Tm
+(- in-memory cache) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 93.00 Tm
+(- password verification route) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 70.00 Tm
+(Frontend architecture) Tj
+ET
+BT
+/F1 8 Tf
+0.45 0.42 0.38 rg
+1 0 0 1 542.00 24 Tm
+(8) Tj
+ET
+endstream
+endobj
+21 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 20 0 R >>
+endobj
+22 0 obj
+<< /Length 3812 >>
+stream
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 736.00 Tm
+(Main frontend entry points:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 712.00 Tm
+(- frontend/src/App.jsx - router and protected routes) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 695.00 Tm
+(- frontend/src/api.js - API client helpers) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 678.00 Tm
+(- frontend/src/pages/Login.jsx - auth screen) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 661.00 Tm
+(- frontend/src/pages/Dashboard.jsx - main control room) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 644.00 Tm
+(- frontend/src/pages/LinkStats.jsx - per-link analytics) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 627.00 Tm
+(- frontend/src/pages/BenchmarkResults.jsx - benchmark dashboard) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 610.00 Tm
+(- frontend/src/components/Navbar.jsx - app shell) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 593.00 Tm
+(- frontend/src/index.css - visual system and layout) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 570.00 Tm
+(Node backend architecture) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 545.00 Tm
+(Main Node backend files:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 521.00 Tm
+(- node-express/src/server.js - Express app, middleware, static serving, route mounting) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 504.00 Tm
+(- node-express/src/auth.js - register and login) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 487.00 Tm
+(- node-express/src/links.js - link CRUD and QR) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 470.00 Tm
+(- node-express/src/redirect.js - slug resolution and redirect behavior) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 453.00 Tm
+(- node-express/src/stats.js - summary metrics) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 436.00 Tm
+(- node-express/src/db.js - SQLite setup) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 419.00 Tm
+(- node-express/src/cache.js - TTL cache) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 402.00 Tm
+(- node-express/src/middleware.js - auth helpers) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 379.00 Tm
+(Flask backend architecture) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 354.00 Tm
+(Main Flask files:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 330.00 Tm
+(- python-flask/app.py - app factory, config, static serving, blueprint registration) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 313.00 Tm
+(- python-flask/auth.py) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 296.00 Tm
+(- python-flask/links.py) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 279.00 Tm
+(- python-flask/redirect.py) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 262.00 Tm
+(- python-flask/stats.py) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 245.00 Tm
+(- python-flask/db.py) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 228.00 Tm
+(- python-flask/cache.py) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 211.00 Tm
+(- python-flask/middleware.py) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 194.00 Tm
+(- python-flask/utils.py) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 177.00 Tm
+(- python-flask/run.sh) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 154.00 Tm
+(Proxy-target architecture) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 129.00 Tm
+(Nginx target:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 105.00 Tm
+(- nginx-proxy/app.py) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 88.00 Tm
+(- nginx-proxy/nginx.conf) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 71.00 Tm
+(- nginx-proxy/run.sh) Tj
+ET
+BT
+/F1 8 Tf
+0.45 0.42 0.38 rg
+1 0 0 1 542.00 24 Tm
+(9) Tj
+ET
+endstream
+endobj
+23 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 22 0 R >>
+endobj
+24 0 obj
+<< /Length 3409 >>
+stream
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 736.00 Tm
+(Apache target:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 712.00 Tm
+(- apache-proxy/app.py) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 695.00 Tm
+(- apache-proxy/httpd.conf) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 678.00 Tm
+(- apache-proxy/run.sh) Tj
+ET
+BT
+/F2 14.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 655.00 Tm
+(12. Important Repository Structure) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 626.00 Tm
+(Top-level working structure:) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 598.00 Tm
+(redirectiq/) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 583.00 Tm
+(??? README.md) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 568.00 Tm
+(??? STATUS_REPORT.md) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 553.00 Tm
+(??? node-express/) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 538.00 Tm
+(??? python-flask/) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 523.00 Tm
+(??? nginx-proxy/) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 508.00 Tm
+(??? apache-proxy/) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 493.00 Tm
+(??? frontend/) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 478.00 Tm
+(??? benchmark/) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 463.00 Tm
+(??? results/) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 448.00 Tm
+(??? docs/) Tj
+ET
+BT
+/F3 9.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 433.00 Tm
+(??? deploy/) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 408.00 Tm
+(Important folders:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 384.00 Tm
+(- node-express/ - Express implementation) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 367.00 Tm
+(- python-flask/ - Flask implementation) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 350.00 Tm
+(- nginx-proxy/ - Nginx reverse-proxy target) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 333.00 Tm
+(- apache-proxy/ - Apache reverse-proxy target) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 316.00 Tm
+(- frontend/ - React/Vite UI) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 299.00 Tm
+(- benchmark/ - active benchmark scripts) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 282.00 Tm
+(- results/ - generated raw and parsed benchmark outputs) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 265.00 Tm
+(- docs/ - report templates and comparison notes) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 248.00 Tm
+(- deploy/ - deployment-oriented configs) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 225.00 Tm
+(Generated and runtime files you usually do not edit:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 201.00 Tm
+(- frontend/dist/) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 184.00 Tm
+(- node_modules/) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 167.00 Tm
+(- *.db) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 150.00 Tm
+(- *.db-wal) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 133.00 Tm
+(- *.db-shm) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 116.00 Tm
+(- results/*) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 99.00 Tm
+(- proxy log files) Tj
+ET
+BT
+/F2 14.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 76.00 Tm
+(13. Submission-Oriented Feature Checklist) Tj
+ET
+BT
+/F1 8 Tf
+0.45 0.42 0.38 rg
+1 0 0 1 542.00 24 Tm
+(10) Tj
+ET
+endstream
+endobj
+25 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 24 0 R >>
+endobj
+26 0 obj
+<< /Length 3646 >>
+stream
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 736.00 Tm
+(Core app requirements) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 711.00 Tm
+(- [x] user registration and login) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 694.00 Tm
+(- [x] JWT-protected APIs) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 677.00 Tm
+(- [x] SQLite persistence) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 660.00 Tm
+(- [x] identical shared API behavior across framework targets) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 643.00 Tm
+(- [x] dashboard for link management) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 626.00 Tm
+(- [x] link analytics page) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 609.00 Tm
+(- [x] QR generation) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 592.00 Tm
+(- [x] health endpoint) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 569.00 Tm
+(Redirect logic requirements) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 544.00 Tm
+(- [x] active/inactive link support) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 527.00 Tm
+(- [x] expiry support) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 510.00 Tm
+(- [x] password-protected redirects) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 493.00 Tm
+(- [x] password verification flow) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 476.00 Tm
+(- [x] A/B split redirect support) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 459.00 Tm
+(- [x] in-memory slug cache with TTL) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 442.00 Tm
+(- [x] click logging) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 425.00 Tm
+(- [x] background geolocation) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 402.00 Tm
+(Benchmark requirements) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 377.00 Tm
+(- [x] benchmark runner script) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 360.00 Tm
+(- [x] wrk-based redirect benchmark) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 343.00 Tm
+(- [x] ApacheBench benchmark) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 326.00 Tm
+(- [x] Locust mixed-user workload) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 309.00 Tm
+(- [x] parser/analyzer) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 292.00 Tm
+(- [x] graph generation) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 275.00 Tm
+(- [x] winner declaration) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 258.00 Tm
+(- [x] frontend benchmark dashboard) Tj
+ET
+BT
+/F2 11.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 235.00 Tm
+(Frontend polish requirements) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 210.00 Tm
+(- [x] refreshed cleaner UI) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 193.00 Tm
+(- [x] persistent benchmark results summary handling) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 176.00 Tm
+(- [x] chart display on results page) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 159.00 Tm
+(- [x] inline QR preview) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 142.00 Tm
+(- [x] stale cached-page reload fix) Tj
+ET
+BT
+/F2 14.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 119.00 Tm
+(14. Known Notes And Limitations) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 90.00 Tm
+(- The Nginx and Apache variants intentionally reuse the Flask application logic behind) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 76.00 Tm
+(different fronting servers, so they are useful for pipeline comparison but not for measuring) Tj
+ET
+BT
+/F1 8 Tf
+0.45 0.42 0.38 rg
+1 0 0 1 542.00 24 Tm
+(11) Tj
+ET
+endstream
+endobj
+27 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 26 0 R >>
+endobj
+28 0 obj
+<< /Length 4026 >>
+stream
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 736.00 Tm
+(independent business-logic implementations.) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 719.00 Tm
+(- BENCHMARK_MODE=true is currently enabled because this repository was being exercised for) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 705.00 Tm
+(load benchmarking.) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 688.00 Tm
+(- The benchmark outcome depends on the machine, OS, installed system tools, and local server) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 674.00 Tm
+(behavior, so winners can differ on another environment.) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 657.00 Tm
+(- The current run shows high Nginx error rate, which should be discussed in the final) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 643.00 Tm
+(submission rather than ignored.) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 626.00 Tm
+(- Some extra directories such as benchmarks/ and deploy/ exist for supporting material, but) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 612.00 Tm
+(the main benchmark flow used for the working project is in benchmark/.) Tj
+ET
+BT
+/F2 14.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 589.00 Tm
+(15. Verification Status) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 560.00 Tm
+(Recently verified in this repository:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 536.00 Tm
+(- frontend lint passes via npm run lint) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 519.00 Tm
+(- frontend production build passes via npm run build) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 502.00 Tm
+(- benchmark summary was successfully generated) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 485.00 Tm
+(- benchmark results were successfully rendered in the frontend results page) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 462.00 Tm
+(Useful output locations:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 438.00 Tm
+(- results/graphs/benchmark-summary.json) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 421.00 Tm
+(- results/graphs/throughput_comparison.png) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 404.00 Tm
+(- results/graphs/latency_p50_p99.png) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 387.00 Tm
+(- results/graphs/latency_scaling_curve.png) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 370.00 Tm
+(- results/graphs/throughput_scaling_curve.png) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 353.00 Tm
+(- results/graphs/error_rate.png) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 336.00 Tm
+(- results/graphs/summary_table.png) Tj
+ET
+BT
+/F2 14.50 Tf
+0.10 0.10 0.10 rg
+1 0 0 1 54.00 313.00 Tm
+(16. Final Status) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 284.00 Tm
+(Project status: Completed baseline submission scope) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 260.00 Tm
+(Completed and ready for submission:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 236.00 Tm
+(- full 4-target backend benchmark setup) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 219.00 Tm
+(- shared React frontend) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 202.00 Tm
+(- benchmark runner and analyzer) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 185.00 Tm
+(- generated benchmark outputs) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 168.00 Tm
+(- cleaned UI for demo and navigation) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 151.00 Tm
+(- detailed documentation and status reporting) Tj
+ET
+BT
+/F1 10.50 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 54.00 128.00 Tm
+(Recommended final submission attachments:) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 104.00 Tm
+(- README.md) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 87.00 Tm
+(- STATUS_REPORT.md) Tj
+ET
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 70.00 Tm
+(- results/graphs/benchmark-summary.json) Tj
+ET
+BT
+/F1 8 Tf
+0.45 0.42 0.38 rg
+1 0 0 1 542.00 24 Tm
+(12) Tj
+ET
+endstream
+endobj
+29 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 28 0 R >>
+endobj
+30 0 obj
+<< /Length 173 >>
+stream
+BT
+/F1 10.00 Tf
+0.12 0.11 0.10 rg
+1 0 0 1 68.00 736.00 Tm
+(- the generated graph PNGs in results/graphs) Tj
+ET
+BT
+/F1 8 Tf
+0.45 0.42 0.38 rg
+1 0 0 1 542.00 24 Tm
+(13) Tj
+ET
+endstream
+endobj
+31 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 30 0 R >>
+endobj
+xref
+0 32
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000205 00000 n 
+0000000275 00000 n 
+0000000350 00000 n 
+0000000418 00000 n 
+0000004389 00000 n 
+0000004535 00000 n 
+0000007965 00000 n 
+0000008111 00000 n 
+0000011563 00000 n 
+0000011711 00000 n 
+0000014965 00000 n 
+0000015113 00000 n 
+0000018721 00000 n 
+0000018869 00000 n 
+0000022223 00000 n 
+0000022371 00000 n 
+0000025587 00000 n 
+0000025735 00000 n 
+0000029477 00000 n 
+0000029625 00000 n 
+0000033489 00000 n 
+0000033637 00000 n 
+0000037098 00000 n 
+0000037246 00000 n 
+0000040944 00000 n 
+0000041092 00000 n 
+0000045170 00000 n 
+0000045318 00000 n 
+0000045542 00000 n 
+trailer
+<< /Size 32 /Root 1 0 R >>
+startxref
+45690
+%%EOF
