@@ -1,8 +1,10 @@
 # Parses RedirectIQ benchmark outputs and generates comparison charts plus a winner summary.
+import csv
 import json
 import math
 import re
 import shutil
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -48,8 +50,12 @@ GRAPH_SPECS = [
     ("error_rate.png", "Error Rate at 500 Concurrent Connections"),
     ("cache_impact_throughput.png", "Cold vs Warm Cache Throughput"),
     ("cache_impact_latency.png", "Cold vs Warm Cache Tail Latency"),
+    ("system_cpu.png", "Backend CPU Usage During Benchmark Run"),
+    ("system_memory.png", "Backend Memory Usage During Benchmark Run"),
     ("summary_table.png", "RedirectIQ Framework Benchmark Summary"),
 ]
+ERROR_BREAKDOWN_KEYS = ["200", "502", "504", "429", "other"]
+HISTORY_FILENAME = "benchmark-history.json"
 
 
 def parse_number(value):
@@ -212,6 +218,68 @@ def load_cache_impact_results():
     return data
 
 
+def load_error_breakdown_results():
+    data = {}
+
+    for framework in FRAMEWORKS:
+        counts = Counter()
+        path = RESULTS_DIR / framework / "error_breakdown.txt"
+
+        if path.exists():
+            for line in path.read_text(errors="ignore").splitlines():
+                status_code = line.strip()
+
+                if status_code:
+                    counts[status_code] += 1
+
+        data[framework] = {
+            "200": counts.get("200", 0),
+            "502": counts.get("502", 0),
+            "504": counts.get("504", 0),
+            "429": counts.get("429", 0),
+            "other": sum(
+                count for status_code, count in counts.items() if status_code not in {"200", "502", "504", "429"}
+            ),
+        }
+
+    return data
+
+
+def load_system_metrics_results():
+    data = {}
+
+    for framework in FRAMEWORKS:
+        path = RESULTS_DIR / framework / f"metrics_{framework}.csv"
+        samples = []
+
+        if path.exists():
+            with path.open(newline="") as metrics_file:
+                reader = csv.DictReader(metrics_file)
+
+                for row in reader:
+                    try:
+                        samples.append(
+                            {
+                                "timestamp": float(row["timestamp"]),
+                                "cpu_percent": float(row["cpu_percent"]),
+                                "rss_memory_mb": float(row["rss_memory_mb"]),
+                                "open_fds": int(float(row["open_fds"])),
+                            }
+                        )
+                    except (KeyError, TypeError, ValueError):
+                        continue
+
+        if samples:
+            start_timestamp = samples[0]["timestamp"]
+
+            for sample in samples:
+                sample["elapsed_seconds"] = sample["timestamp"] - start_timestamp
+
+        data[framework] = samples
+
+    return data
+
+
 def save_throughput_comparison(data):
     figure, axis = plt.subplots(figsize=(12, 7))
     x_positions = list(range(len(CONCURRENCY_LEVELS)))
@@ -368,6 +436,69 @@ def save_cache_impact_latency(cache_impact_data):
     )
 
 
+def save_system_metrics_chart(system_metrics_data, metric_key, filename, title, ylabel):
+    figure, axis = plt.subplots(figsize=(12, 7))
+    has_series = False
+
+    for framework in FRAMEWORKS:
+        samples = system_metrics_data.get(framework, [])
+
+        if not samples:
+            continue
+
+        axis.plot(
+            [sample["elapsed_seconds"] for sample in samples],
+            [sample[metric_key] for sample in samples],
+            linewidth=2.5,
+            label=framework,
+            color=COLORS[framework],
+        )
+        has_series = True
+
+    axis.set_xlabel("Seconds Since Collector Start")
+    axis.set_ylabel(ylabel)
+    axis.set_title(title)
+    axis.grid(alpha=0.25)
+
+    if has_series:
+        axis.legend()
+    else:
+        axis.text(
+            0.5,
+            0.5,
+            "No system metrics data available yet.\nRun bash benchmark/run_bench.sh again to capture it.",
+            ha="center",
+            va="center",
+            transform=axis.transAxes,
+            fontsize=11,
+            color="#6b7280",
+        )
+
+    figure.tight_layout()
+    figure.savefig(GRAPHS_DIR / filename, dpi=200)
+    plt.close(figure)
+
+
+def save_system_cpu_chart(system_metrics_data):
+    save_system_metrics_chart(
+        system_metrics_data,
+        "cpu_percent",
+        "system_cpu.png",
+        "Backend CPU Usage During Benchmark Run",
+        "CPU (%)",
+    )
+
+
+def save_system_memory_chart(system_metrics_data):
+    save_system_metrics_chart(
+        system_metrics_data,
+        "rss_memory_mb",
+        "system_memory.png",
+        "Backend Memory Usage During Benchmark Run",
+        "RSS Memory (MB)",
+    )
+
+
 def format_metric(value, suffix=""):
     if value is None or math.isnan(value):
         return "n/a"
@@ -488,7 +619,43 @@ def choose_winners(data):
     return throughput_winner, latency_winner, overall_winner
 
 
-def build_summary_payload(data, cache_impact_data, throughput_winner, latency_winner, overall_winner):
+def build_system_metrics_summary(system_metrics_data):
+    summary = {}
+
+    for framework in FRAMEWORKS:
+        samples = system_metrics_data.get(framework, [])
+
+        if not samples:
+            summary[framework] = {
+                "peak_cpu": None,
+                "avg_cpu": None,
+                "peak_memory_mb": None,
+                "avg_memory_mb": None,
+            }
+            continue
+
+        cpu_values = [sample["cpu_percent"] for sample in samples]
+        memory_values = [sample["rss_memory_mb"] for sample in samples]
+
+        summary[framework] = {
+            "peak_cpu": sanitize_number(max(cpu_values)),
+            "avg_cpu": sanitize_number(sum(cpu_values) / len(cpu_values)),
+            "peak_memory_mb": sanitize_number(max(memory_values)),
+            "avg_memory_mb": sanitize_number(sum(memory_values) / len(memory_values)),
+        }
+
+    return summary
+
+
+def build_summary_payload(
+    data,
+    cache_impact_data,
+    error_breakdown_data,
+    system_metrics_data,
+    throughput_winner,
+    latency_winner,
+    overall_winner,
+):
     summary_rows = []
     series = {}
 
@@ -566,6 +733,14 @@ def build_summary_payload(data, cache_impact_data, throughput_winner, latency_wi
                 for framework in FRAMEWORKS
             },
         },
+        "error_breakdown": {
+            framework: {
+                key: int(error_breakdown_data[framework].get(key, 0))
+                for key in ERROR_BREAKDOWN_KEYS
+            }
+            for framework in FRAMEWORKS
+        },
+        "system_metrics": build_system_metrics_summary(system_metrics_data),
         "graphs": [
             {
                 "file": filename,
@@ -606,6 +781,19 @@ def build_empty_payload():
                 for framework in FRAMEWORKS
             },
         },
+        "error_breakdown": {
+            framework: {key: 0 for key in ERROR_BREAKDOWN_KEYS}
+            for framework in FRAMEWORKS
+        },
+        "system_metrics": {
+            framework: {
+                "peak_cpu": None,
+                "avg_cpu": None,
+                "peak_memory_mb": None,
+                "avg_memory_mb": None,
+            }
+            for framework in FRAMEWORKS
+        },
         "graphs": [
             {
                 "file": filename,
@@ -631,6 +819,77 @@ def write_summary_artifacts(payload):
         target_path.write_text(f"{json.dumps(payload, indent=2)}\n")
 
 
+def read_history_entries():
+    history_path = GRAPHS_DIR / HISTORY_FILENAME
+
+    if not history_path.exists():
+        return []
+
+    try:
+        payload = json.loads(history_path.read_text())
+    except json.JSONDecodeError:
+        return []
+
+    return payload if isinstance(payload, list) else []
+
+
+def write_history_artifacts(entries):
+    target_paths = [
+        GRAPHS_DIR / HISTORY_FILENAME,
+        FRONTEND_PUBLIC_DIR / HISTORY_FILENAME,
+    ]
+
+    if FRONTEND_DIST_DIR.exists():
+        target_paths.append(FRONTEND_DIST_DIR / HISTORY_FILENAME)
+
+    serialized = f"{json.dumps(entries, indent=2)}\n"
+
+    for target_path in target_paths:
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        target_path.write_text(serialized)
+
+
+def build_history_entry(payload):
+    timestamp = payload.get("generatedAt") or datetime.now(timezone.utc).isoformat()
+    run_id = datetime.now(timezone.utc).strftime("run-%Y%m%dT%H%M%S%fZ")
+
+    return {
+        "run_id": run_id,
+        "timestamp": timestamp,
+        "summary": payload,
+    }
+
+
+def print_regression_warnings(current_payload, previous_entries):
+    if not previous_entries:
+        return
+
+    previous_summary = previous_entries[-1].get("summary") or {}
+    previous_rows = {
+        row.get("framework"): row
+        for row in previous_summary.get("summaryTable", [])
+        if isinstance(row, dict) and row.get("framework")
+    }
+
+    for row in current_payload.get("summaryTable", []):
+        framework = row.get("framework")
+        previous_row = previous_rows.get(framework)
+
+        if not framework or not previous_row:
+            continue
+
+        previous_throughput = previous_row.get("bestThroughput")
+        current_throughput = row.get("bestThroughput")
+
+        if not previous_throughput or current_throughput is None:
+            continue
+
+        drop_fraction = (previous_throughput - current_throughput) / previous_throughput
+
+        if drop_fraction > 0.10:
+            print(f"REGRESSION DETECTED: {framework} throughput dropped {drop_fraction * 100:.2f}%.")
+
+
 def publish_graph_artifacts():
     destinations = [FRONTEND_PUBLIC_DIR / FRONTEND_GRAPHS_DIRNAME]
 
@@ -651,6 +910,8 @@ def main():
     GRAPHS_DIR.mkdir(parents=True, exist_ok=True)
     data = load_results()
     cache_impact_data = load_cache_impact_results()
+    error_breakdown_data = load_error_breakdown_results()
+    system_metrics_data = load_system_metrics_results()
 
     if not has_any_benchmark_data(data):
         write_summary_artifacts(build_empty_payload())
@@ -675,11 +936,25 @@ def main():
     save_error_rate(data)
     save_cache_impact_throughput(cache_impact_data)
     save_cache_impact_latency(cache_impact_data)
+    save_system_cpu_chart(system_metrics_data)
+    save_system_memory_chart(system_metrics_data)
     save_summary_table(data)
 
     throughput_winner, latency_winner, overall_winner = choose_winners(data)
-    payload = build_summary_payload(data, cache_impact_data, throughput_winner, latency_winner, overall_winner)
+    payload = build_summary_payload(
+        data,
+        cache_impact_data,
+        error_breakdown_data,
+        system_metrics_data,
+        throughput_winner,
+        latency_winner,
+        overall_winner,
+    )
     write_summary_artifacts(payload)
+    history_entries = read_history_entries()
+    print_regression_warnings(payload, history_entries)
+    history_entries.append(build_history_entry(payload))
+    write_history_artifacts(history_entries)
     publish_graph_artifacts()
     print(f"THROUGHPUT WINNER: {throughput_winner[0]} ({throughput_winner[1]:.2f} req/s at c500)")
     print(f"LATENCY WINNER: {latency_winner[0]} ({latency_winner[1]:.2f}ms p99 at c100)")
