@@ -16,6 +16,7 @@ RUN groupadd -r _www \
     && useradd -r -g _www _www \
     && mkdir -p /app/data /app/logs /private/etc /Users/anish/Documents/redirectiq /usr/libexec \
     && ln -sf /etc/apache2 /private/etc/apache2 \
+    && ln -sf /etc/mime.types /private/etc/apache2/mime.types \
     && ln -sf /usr/lib/apache2/modules /usr/libexec/apache2 \
     && ln -sf /app /Users/anish/Documents/redirectiq/apache-proxy \
     && ln -sf /app/data/redirectiq.db /app/redirectiq.db \
