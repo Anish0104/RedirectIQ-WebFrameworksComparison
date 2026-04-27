@@ -1,6 +1,6 @@
 {
   "hasData": true,
-  "generatedAt": "2026-04-27T21:31:03.440279+00:00",
+  "generatedAt": "2026-04-27T22:38:29.295685+00:00",
   "frameworks": [
     "node",
     "flask",
@@ -351,6 +351,62 @@
       }
     }
   },
+  "error_breakdown": {
+    "node": {
+      "200": 0,
+      "502": 0,
+      "504": 0,
+      "429": 0,
+      "other": 0
+    },
+    "flask": {
+      "200": 0,
+      "502": 0,
+      "504": 0,
+      "429": 0,
+      "other": 0
+    },
+    "nginx": {
+      "200": 0,
+      "502": 0,
+      "504": 0,
+      "429": 0,
+      "other": 0
+    },
+    "apache": {
+      "200": 0,
+      "502": 0,
+      "504": 0,
+      "429": 0,
+      "other": 0
+    }
+  },
+  "system_metrics": {
+    "node": {
+      "peak_cpu": null,
+      "avg_cpu": null,
+      "peak_memory_mb": null,
+      "avg_memory_mb": null
+    },
+    "flask": {
+      "peak_cpu": null,
+      "avg_cpu": null,
+      "peak_memory_mb": null,
+      "avg_memory_mb": null
+    },
+    "nginx": {
+      "peak_cpu": null,
+      "avg_cpu": null,
+      "peak_memory_mb": null,
+      "avg_memory_mb": null
+    },
+    "apache": {
+      "peak_cpu": null,
+      "avg_cpu": null,
+      "peak_memory_mb": null,
+      "avg_memory_mb": null
+    }
+  },
   "graphs": [
     {
       "file": "throughput_comparison.png",
@@ -386,6 +442,16 @@
       "file": "cache_impact_latency.png",
       "title": "Cold vs Warm Cache Tail Latency",
       "url": "/benchmark-graphs/cache_impact_latency.png"
+    },
+    {
+      "file": "system_cpu.png",
+      "title": "Backend CPU Usage During Benchmark Run",
+      "url": "/benchmark-graphs/system_cpu.png"
+    },
+    {
+      "file": "system_memory.png",
+      "title": "Backend Memory Usage During Benchmark Run",
+      "url": "/benchmark-graphs/system_memory.png"
     },
     {
       "file": "summary_table.png",
