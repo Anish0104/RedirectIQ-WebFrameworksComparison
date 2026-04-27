@@ -37,6 +37,38 @@ const BACKEND_TARGETS = [
 ];
 
 const BENCHMARK_SUMMARY_STORAGE_KEY = 'redirectiq_benchmark_summary_v1';
+const QUALITATIVE_DIMENSIONS = [
+  'Setup ease',
+  'Config simplicity',
+  'Code clarity',
+  'Failure handling',
+  'Debug/DX',
+  'Deploy ease'
+];
+const QUALITATIVE_SCORES = {
+  node: [5, 5, 5, 5, 5, 5],
+  flask: [5, 4, 4, 4, 4, 4],
+  nginx: [2, 2, 3, 1, 2, 2],
+  apache: [2, 2, 3, 3, 2, 2]
+};
+const QUALITATIVE_EXPLANATIONS = [
+  {
+    title: 'Setup difficulty',
+    text: 'Node and Flask only need npm install or pip install. Nginx requires writing a working nginx.conf with proxy rules and worker tuning. Apache needs an httpd.conf with mod_proxy enabled and VirtualHost blocks.'
+  },
+  {
+    title: 'Code simplicity',
+    text: "Node's Express routing is concise and idiomatic. Flask achieves similar clarity with blueprints. The Nginx and Apache variants layer an extra abstraction — a Python app plus a separate reverse proxy config — which doubles the places where things can break."
+  },
+  {
+    title: 'Failure behavior',
+    text: 'Under high concurrency, Node degraded gracefully — latency climbed but error rate stayed at 0%. Flask stayed stable but slowly throttled. Nginx hit an 86% error rate at c500, likely from worker/connection limits. Apache showed extreme tail latency (1520ms p99) suggesting queue buildup rather than clean rejection.'
+  },
+  {
+    title: 'Developer experience',
+    text: 'Node and Flask both gave clear, readable error messages during development. Nginx and Apache failures were harder to diagnose — errors appeared as generic 502/504 responses with the actual cause buried in server logs, adding significant debugging time.'
+  }
+];
 
 const EMPTY_RESULTS = {
   hasData: false,
@@ -180,6 +212,20 @@ function getFrameworkLabel(framework) {
 
 function getFrameworkColor(framework) {
   return FRAMEWORK_COLORS[framework] || '#172033';
+}
+
+function withAlpha(hexColor, alpha) {
+  const normalized = String(hexColor || '').replace('#', '');
+
+  if (normalized.length !== 6) {
+    return hexColor;
+  }
+
+  const red = Number.parseInt(normalized.slice(0, 2), 16);
+  const green = Number.parseInt(normalized.slice(2, 4), 16);
+  const blue = Number.parseInt(normalized.slice(4, 6), 16);
+
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
 function getSeriesPoint(summary, framework, concurrency) {
@@ -365,6 +411,220 @@ function LatencyComparisonChart({ data }) {
             <Bar dataKey="p99" name="p99" fill="#db6a4d" radius={[12, 12, 4, 4]} isAnimationActive={false} />
           </BarChart>
         </ResponsiveContainer>
+      </div>
+    </article>
+  );
+}
+
+function polarToCartesian(center, radius, index, total) {
+  const angle = -Math.PI / 2 + (Math.PI * 2 * index) / total;
+
+  return {
+    x: center + Math.cos(angle) * radius,
+    y: center + Math.sin(angle) * radius
+  };
+}
+
+function buildRadarPolygon(scores, center, radius, maxScore) {
+  return scores
+    .map(function mapScoreToPoint(score, index) {
+      const scaledRadius = (radius * score) / maxScore;
+      const point = polarToCartesian(center, scaledRadius, index, scores.length);
+
+      return `${point.x},${point.y}`;
+    })
+    .join(' ');
+}
+
+function QualitativeRadarChart({ frameworks }) {
+  const chartSize = 420;
+  const center = 210;
+  const radius = 128;
+  const labelRadius = 164;
+  const maxScore = 5;
+  const orderedFrameworks = frameworks.filter(function hasScores(framework) {
+    return Array.isArray(QUALITATIVE_SCORES[framework]);
+  });
+
+  return (
+    <article className="card chart-card qualitative-chart-card">
+      <div className="chart-card__header">
+        <div>
+          <h2>Qualitative radar</h2>
+          <p>Five is best. This weighs setup, clarity, stability, and day-to-day development friction.</p>
+        </div>
+      </div>
+      <div className="chart-shell chart-shell--qualitative">
+        <svg
+          className="qualitative-radar"
+          viewBox={`0 0 ${chartSize} ${chartSize}`}
+          role="img"
+          aria-label="Radar chart comparing qualitative framework scores"
+        >
+          {[1, 2, 3, 4, 5].map(function renderRing(level) {
+            const ringPoints = QUALITATIVE_DIMENSIONS.map(function buildRingPoint(_, index) {
+              const point = polarToCartesian(center, (radius * level) / maxScore, index, QUALITATIVE_DIMENSIONS.length);
+              return `${point.x},${point.y}`;
+            }).join(' ');
+
+            return (
+              <polygon
+                key={level}
+                points={ringPoints}
+                fill="none"
+                stroke="rgba(24, 22, 20, 0.12)"
+                strokeWidth="1"
+              />
+            );
+          })}
+
+          {QUALITATIVE_DIMENSIONS.map(function renderAxis(_, index) {
+            const point = polarToCartesian(center, radius, index, QUALITATIVE_DIMENSIONS.length);
+
+            return (
+              <line
+                key={QUALITATIVE_DIMENSIONS[index]}
+                x1={center}
+                y1={center}
+                x2={point.x}
+                y2={point.y}
+                stroke="rgba(24, 22, 20, 0.12)"
+                strokeWidth="1"
+              />
+            );
+          })}
+
+          {[1, 2, 3, 4, 5].map(function renderTick(level) {
+            return (
+              <text
+                key={`tick-${level}`}
+                x={center + 8}
+                y={center - (radius * level) / maxScore + 4}
+                className="qualitative-radar__tick"
+              >
+                {level}
+              </text>
+            );
+          })}
+
+          {orderedFrameworks.map(function renderFrameworkPolygon(framework) {
+            const color = getFrameworkColor(framework);
+            const scores = QUALITATIVE_SCORES[framework];
+
+            return (
+              <polygon
+                key={framework}
+                points={buildRadarPolygon(scores, center, radius, maxScore)}
+                fill={withAlpha(color, 0.12)}
+                stroke={color}
+                strokeWidth="2.5"
+              />
+            );
+          })}
+
+          {orderedFrameworks.map(function renderFrameworkDots(framework) {
+            const color = getFrameworkColor(framework);
+
+            return QUALITATIVE_SCORES[framework].map(function renderFrameworkDot(score, index) {
+              const point = polarToCartesian(center, (radius * score) / maxScore, index, QUALITATIVE_DIMENSIONS.length);
+
+              return (
+                <circle
+                  key={`${framework}-${QUALITATIVE_DIMENSIONS[index]}`}
+                  cx={point.x}
+                  cy={point.y}
+                  r="3.5"
+                  fill={color}
+                />
+              );
+            });
+          })}
+
+          {QUALITATIVE_DIMENSIONS.map(function renderAxisLabel(label, index) {
+            const point = polarToCartesian(center, labelRadius, index, QUALITATIVE_DIMENSIONS.length);
+            const textAnchor =
+              Math.abs(point.x - center) < 10 ? 'middle' : point.x > center ? 'start' : 'end';
+
+            return (
+              <text
+                key={label}
+                x={point.x}
+                y={point.y}
+                textAnchor={textAnchor}
+                className="qualitative-radar__label"
+              >
+                {label}
+              </text>
+            );
+          })}
+        </svg>
+      </div>
+      <div className="qualitative-legend" aria-label="Framework color legend">
+        {orderedFrameworks.map(function renderLegendItem(framework) {
+          return (
+            <div key={framework} className="qualitative-legend__item">
+              <span
+                className="qualitative-legend__swatch"
+                style={{ backgroundColor: getFrameworkColor(framework) }}
+                aria-hidden="true"
+              />
+              <span>{getFrameworkLabel(framework)}</span>
+            </div>
+          );
+        })}
+      </div>
+    </article>
+  );
+}
+
+function DotScoreCard({ framework }) {
+  return (
+    <article className="qualitative-score-card">
+      <div className="qualitative-score-card__header">
+        <span className="qualitative-score-card__eyebrow">Framework</span>
+        <strong style={{ color: getFrameworkColor(framework) }}>{getFrameworkLabel(framework)}</strong>
+      </div>
+      <div className="qualitative-score-list">
+        {QUALITATIVE_DIMENSIONS.map(function renderMetric(label, index) {
+          const score = QUALITATIVE_SCORES[framework][index];
+
+          return (
+            <div key={`${framework}-${label}`} className="qualitative-score-row">
+              <span className="qualitative-score-row__label">{label}</span>
+              <div className="qualitative-dot-row" aria-label={`${label}: ${score} out of 5`}>
+                {[1, 2, 3, 4, 5].map(function renderDot(value) {
+                  return (
+                    <span
+                      key={`${framework}-${label}-${value}`}
+                      className={`qualitative-dot ${value <= score ? 'qualitative-dot--filled' : ''}`}
+                      style={
+                        value <= score
+                          ? {
+                              backgroundColor: getFrameworkColor(framework),
+                              boxShadow: `0 0 0 1px ${withAlpha(getFrameworkColor(framework), 0.35)}`
+                            }
+                          : undefined
+                      }
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </article>
+  );
+}
+
+function QualitativeExplanationCard({ title, text }) {
+  return (
+    <article className="card qualitative-explanation-card">
+      <div className="section-card__header">
+        <div>
+          <h3>{title}</h3>
+          <p>{text}</p>
+        </div>
       </div>
     </article>
   );
@@ -634,6 +894,11 @@ function BenchmarkResults() {
   const throughputBarData = hasData ? buildThroughputBars(summary) : [];
   const latencyBarData = hasData ? buildLatencyBars(summary) : [];
   const errorBarData = hasData ? buildErrorBars(summary) : [];
+  const qualitativeFrameworks = hasData
+    ? summary.frameworks.filter(function hasQualitativeScores(framework) {
+        return Array.isArray(QUALITATIVE_SCORES[framework]);
+      })
+    : [];
 
   return (
     <div className="page-shell">
@@ -894,6 +1159,40 @@ function BenchmarkResults() {
                 dataKey="errorRate"
                 unitSuffix=" %"
               />
+            </section>
+
+            <section className="card section-card qualitative-section">
+              <div className="section-card__header">
+                <div>
+                  <h2>Qualitative Analysis</h2>
+                  <p>
+                    The throughput winner is only part of the story. This compares each stack on setup,
+                    clarity, resilience, and day-to-day developer experience.
+                  </p>
+                </div>
+              </div>
+
+              <div className="qualitative-layout">
+                <QualitativeRadarChart frameworks={qualitativeFrameworks} />
+
+                <div className="qualitative-score-grid">
+                  {qualitativeFrameworks.map(function renderScoreCard(framework) {
+                    return <DotScoreCard key={framework} framework={framework} />;
+                  })}
+                </div>
+
+                <div className="qualitative-explanation-grid">
+                  {QUALITATIVE_EXPLANATIONS.map(function renderExplanationCard(card) {
+                    return (
+                      <QualitativeExplanationCard
+                        key={card.title}
+                        title={card.title}
+                        text={card.text}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
             </section>
 
             <section className="card section-card">
