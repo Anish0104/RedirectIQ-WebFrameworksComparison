@@ -49,6 +49,20 @@ python benchmark/analyze.py
 
 Graphs are saved to `results/graphs/`, the overall winner is printed to the console, and the frontend results dashboard is available at `http://localhost:5173/results`.
 
+## Results dashboard
+
+The `/results` page combines quantitative benchmark outputs with a qualitative comparison layer:
+
+- Winner cards for overall, throughput, and latency leaders
+- Interactive throughput, latency, and error charts
+- A summary table for key checkpoints at tested concurrency levels
+- A qualitative analysis section with:
+  - a radar-style framework comparison across setup ease, config simplicity, code clarity, failure handling, debug/DX, and deploy ease
+  - per-framework dot scorecards in a dark terminal-style layout
+  - short writeups covering setup difficulty, code simplicity, failure behavior, and developer experience
+
+This makes the results page useful both for raw performance comparison and for explaining the operational tradeoffs between Node, Flask, Nginx, and Apache.
+
 ## Architecture diagram (ASCII)
 ```text
                            +-------------------------+
