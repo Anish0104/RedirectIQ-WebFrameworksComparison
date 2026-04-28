@@ -1,15 +1,15 @@
-Running 30s test @ http://127.0.0.1:3003/d165e32
+Running 30s test @ http://127.0.0.1:3003/d5e7e25
   4 threads and 250 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency    46.68ms   37.15ms   1.14s    98.03%
-    Req/Sec     1.28k   343.68     1.95k    62.58%
+    Latency    43.26ms   29.88ms   1.12s    97.96%
+    Req/Sec     1.39k   297.76     1.89k    74.17%
   Latency Distribution
-     50%   43.00ms
-     75%   44.16ms
-     90%   48.80ms
-     99%  115.63ms
-  153717 requests in 30.10s, 50.57MB read
-  Socket errors: connect 0, read 0, write 0, timeout 153
-  Non-2xx or 3xx responses: 137630
-Requests/sec:   5107.59
-Transfer/sec:      1.68MB
+     50%   41.16ms
+     75%   41.80ms
+     90%   42.28ms
+     99%  103.46ms
+  166233 requests in 30.07s, 54.28MB read
+  Socket errors: connect 0, read 0, write 0, timeout 124
+  Non-2xx or 3xx responses: 150276
+Requests/sec:   5527.74
+Transfer/sec:      1.81MB

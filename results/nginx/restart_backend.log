@@ -1,0 +1,16 @@
+Nginx+Gunicorn running on port 3003
+[2026-04-28 13:12:48 -0400] [95160] [INFO] Starting gunicorn 23.0.0
+[2026-04-28 13:12:48 -0400] [95160] [INFO] Listening at: http://127.0.0.1:8003 (95160)
+[2026-04-28 13:12:48 -0400] [95160] [INFO] Using worker: sync
+[2026-04-28 13:12:48 -0400] [95176] [INFO] Booting worker with pid: 95176
+[2026-04-28 13:12:48 -0400] [95181] [INFO] Booting worker with pid: 95181
+[2026-04-28 13:12:48 -0400] [95182] [INFO] Booting worker with pid: 95182
+[2026-04-28 13:12:48 -0400] [95183] [INFO] Booting worker with pid: 95183
+/Users/anish/Documents/redirectiq/nginx-proxy/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/anish/Documents/redirectiq/nginx-proxy/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/anish/Documents/redirectiq/nginx-proxy/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/anish/Documents/redirectiq/nginx-proxy/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(

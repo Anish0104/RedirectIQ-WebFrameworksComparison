@@ -20,35 +20,35 @@ Server Software:        nginx/1.29.7
 Server Hostname:        127.0.0.1
 Server Port:            3003
 
-Document Path:          /d165e32
+Document Path:          /d5e7e25
 Document Length:        225 bytes
 
 Concurrency Level:      100
-Time taken for tests:   0.311 seconds
+Time taken for tests:   0.281 seconds
 Complete requests:      1000
 Failed requests:        0
 Non-2xx responses:      1000
 Total transferred:      605004 bytes
 HTML transferred:       225000 bytes
-Requests per second:    3217.79 [#/sec] (mean)
-Time per request:       31.077 [ms] (mean)
-Time per request:       0.311 [ms] (mean, across all concurrent requests)
-Transfer rate:          1901.15 [Kbytes/sec] received
+Requests per second:    3562.92 [#/sec] (mean)
+Time per request:       28.067 [ms] (mean)
+Time per request:       0.281 [ms] (mean, across all concurrent requests)
+Transfer rate:          2105.06 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0    0   0.4      0       2
-Processing:     3   29   5.7     29      55
-Waiting:        2   29   5.7     29      55
-Total:          3   29   5.5     29      55
+Connect:        0    0   0.6      0       2
+Processing:     9   26   3.7     25      43
+Waiting:        6   26   3.7     25      43
+Total:          9   26   4.1     25      45
 
 Percentage of the requests served within a certain time (ms)
-  50%     29
-  66%     32
-  75%     33
-  80%     33
-  90%     35
-  95%     37
-  98%     38
-  99%     38
- 100%     55 (longest request)
+  50%     25
+  66%     27
+  75%     28
+  80%     28
+  90%     30
+  95%     35
+  98%     41
+  99%     43
+ 100%     45 (longest request)
