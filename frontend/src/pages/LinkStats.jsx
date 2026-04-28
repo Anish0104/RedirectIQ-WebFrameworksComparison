@@ -10,7 +10,7 @@ import {
   YAxis
 } from 'recharts';
 import api, { getApiErrorMessage } from '../api';
-import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
 import ClickChart from '../components/ClickChart';
 
 function formatDate(value) {
@@ -110,10 +110,11 @@ function LinkStats() {
   );
 
   return (
-    <div className="page-shell">
-      <Navbar />
+    <main className="dashboard-page">
+      <div className="dashboard-shell">
+        <Sidebar loading={loading} />
 
-      <main className="page-content">
+        <section className="dashboard-stage">
         {loading ? (
           <section className="card loading-card">
             <p>Loading link analytics...</p>
@@ -328,8 +329,9 @@ function LinkStats() {
             </section>
           </>
         ) : null}
-      </main>
-    </div>
+        </section>
+      </div>
+    </main>
   );
 }
 
