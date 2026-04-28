@@ -464,5 +464,471 @@
         }
       ]
     }
+  },
+  {
+    "run_id": "run-20260428T172155502602Z",
+    "timestamp": "2026-04-28T17:21:55.501142+00:00",
+    "summary": {
+      "hasData": true,
+      "generatedAt": "2026-04-28T17:21:55.501142+00:00",
+      "frameworks": [
+        "node",
+        "flask",
+        "nginx",
+        "apache"
+      ],
+      "concurrencyLevels": [
+        1,
+        10,
+        50,
+        100,
+        250,
+        500
+      ],
+      "winners": {
+        "throughput": {
+          "framework": "node",
+          "value": 6990.99,
+          "concurrency": 500
+        },
+        "latency": {
+          "framework": "node",
+          "value": 29.4,
+          "concurrency": 100
+        },
+        "overall": {
+          "framework": "node"
+        }
+      },
+      "summaryTable": [
+        {
+          "framework": "node",
+          "bestThroughput": 6990.99,
+          "p50At100": 11.16,
+          "p99At100": 29.4,
+          "p99At500": 703.1,
+          "errorRate": 0.0
+        },
+        {
+          "framework": "flask",
+          "bestThroughput": 542.54,
+          "p50At100": 27.46,
+          "p99At100": 39.45,
+          "p99At500": 47.21,
+          "errorRate": 0.0
+        },
+        {
+          "framework": "nginx",
+          "bestThroughput": 5527.74,
+          "p50At100": 17.8,
+          "p99At100": 48.59,
+          "p99At500": 258.53,
+          "errorRate": 89.63856296556273
+        },
+        {
+          "framework": "apache",
+          "bestThroughput": 531.24,
+          "p50At100": 3.8,
+          "p99At100": 1150.0,
+          "p99At500": 78.02,
+          "errorRate": 6.55952976488244
+        }
+      ],
+      "series": {
+        "node": [
+          {
+            "concurrency": 1,
+            "requestsSec": 5858.13,
+            "p50Ms": 0.154,
+            "p99Ms": 7.74,
+            "errorRate": 0.0,
+            "nonSuccess": 0,
+            "totalRequests": 175913.0
+          },
+          {
+            "concurrency": 10,
+            "requestsSec": 6042.63,
+            "p50Ms": 0.94,
+            "p99Ms": 11.73,
+            "errorRate": 0.0,
+            "nonSuccess": 0,
+            "totalRequests": 181560.0
+          },
+          {
+            "concurrency": 50,
+            "requestsSec": 6180.6,
+            "p50Ms": 5.54,
+            "p99Ms": 21.82,
+            "errorRate": 0.0,
+            "nonSuccess": 0,
+            "totalRequests": 185995.0
+          },
+          {
+            "concurrency": 100,
+            "requestsSec": 6609.47,
+            "p50Ms": 11.16,
+            "p99Ms": 29.4,
+            "errorRate": 0.0,
+            "nonSuccess": 0,
+            "totalRequests": 198976.0
+          },
+          {
+            "concurrency": 250,
+            "requestsSec": 6305.02,
+            "p50Ms": 39.24,
+            "p99Ms": 654.21,
+            "errorRate": 0.0,
+            "nonSuccess": 0,
+            "totalRequests": 189641.0
+          },
+          {
+            "concurrency": 500,
+            "requestsSec": 6990.99,
+            "p50Ms": 67.43,
+            "p99Ms": 703.1,
+            "errorRate": 0.0,
+            "nonSuccess": 0,
+            "totalRequests": 210407.0
+          }
+        ],
+        "flask": [
+          {
+            "concurrency": 1,
+            "requestsSec": 538.68,
+            "p50Ms": 0.412,
+            "p99Ms": 0.99,
+            "errorRate": 0.0,
+            "nonSuccess": 0,
+            "totalRequests": 16211.0
+          },
+          {
+            "concurrency": 10,
+            "requestsSec": 541.83,
+            "p50Ms": 2.46,
+            "p99Ms": 5.39,
+            "errorRate": 0.0,
+            "nonSuccess": 0,
+            "totalRequests": 16264.0
+          },
+          {
+            "concurrency": 50,
+            "requestsSec": 538.91,
+            "p50Ms": 13.23,
+            "p99Ms": 19.57,
+            "errorRate": 0.0,
+            "nonSuccess": 0,
+            "totalRequests": 16182.0
+          },
+          {
+            "concurrency": 100,
+            "requestsSec": 539.01,
+            "p50Ms": 27.46,
+            "p99Ms": 39.45,
+            "errorRate": 0.0,
+            "nonSuccess": 0,
+            "totalRequests": 16189.0
+          },
+          {
+            "concurrency": 250,
+            "requestsSec": 541.05,
+            "p50Ms": 36.14,
+            "p99Ms": 48.65,
+            "errorRate": 0.0,
+            "nonSuccess": 0,
+            "totalRequests": 16248.0
+          },
+          {
+            "concurrency": 500,
+            "requestsSec": 542.54,
+            "p50Ms": 35.91,
+            "p99Ms": 47.21,
+            "errorRate": 0.0,
+            "nonSuccess": 0,
+            "totalRequests": 16291.0
+          }
+        ],
+        "nginx": [
+          {
+            "concurrency": 1,
+            "requestsSec": 33.26,
+            "p50Ms": 0.184,
+            "p99Ms": 1.4,
+            "errorRate": 72.6,
+            "nonSuccess": 726,
+            "totalRequests": 1000.0
+          },
+          {
+            "concurrency": 10,
+            "requestsSec": 766.2,
+            "p50Ms": 2.12,
+            "p99Ms": 4.68,
+            "errorRate": 34.708695652173915,
+            "nonSuccess": 7983,
+            "totalRequests": 23000.0
+          },
+          {
+            "concurrency": 50,
+            "requestsSec": 1894.3,
+            "p50Ms": 9.0,
+            "p99Ms": 26.51,
+            "errorRate": 73.1280701754386,
+            "nonSuccess": 41683,
+            "totalRequests": 57000.0
+          },
+          {
+            "concurrency": 100,
+            "requestsSec": 3787.69,
+            "p50Ms": 17.8,
+            "p99Ms": 48.59,
+            "errorRate": 86.1280701754386,
+            "nonSuccess": 98186,
+            "totalRequests": 114000.0
+          },
+          {
+            "concurrency": 250,
+            "requestsSec": 5527.74,
+            "p50Ms": 41.16,
+            "p99Ms": 103.46,
+            "errorRate": 90.40082294129324,
+            "nonSuccess": 150276,
+            "totalRequests": 166233.0
+          },
+          {
+            "concurrency": 500,
+            "requestsSec": 5490.07,
+            "p50Ms": 82.98,
+            "p99Ms": 258.53,
+            "errorRate": 89.63856296556273,
+            "nonSuccess": 148134,
+            "totalRequests": 165257.0
+          }
+        ],
+        "apache": [
+          {
+            "concurrency": 1,
+            "requestsSec": 36.27,
+            "p50Ms": 0.492,
+            "p99Ms": 1.35,
+            "errorRate": 0.09174311926605505,
+            "nonSuccess": 1,
+            "totalRequests": 1090.0
+          },
+          {
+            "concurrency": 10,
+            "requestsSec": 492.38,
+            "p50Ms": 2.31,
+            "p99Ms": 3.99,
+            "errorRate": 0.11499695596293039,
+            "nonSuccess": 17,
+            "totalRequests": 14783.0
+          },
+          {
+            "concurrency": 50,
+            "requestsSec": 498.05,
+            "p50Ms": 3.89,
+            "p99Ms": 939.5,
+            "errorRate": 0.6951406991511262,
+            "nonSuccess": 104,
+            "totalRequests": 14961.0
+          },
+          {
+            "concurrency": 100,
+            "requestsSec": 508.86,
+            "p50Ms": 3.8,
+            "p99Ms": 1150.0,
+            "errorRate": 1.1387434554973823,
+            "nonSuccess": 174,
+            "totalRequests": 15280.0
+          },
+          {
+            "concurrency": 250,
+            "requestsSec": 514.1,
+            "p50Ms": 3.76,
+            "p99Ms": 686.15,
+            "errorRate": 3.51365342306199,
+            "nonSuccess": 543,
+            "totalRequests": 15454.0
+          },
+          {
+            "concurrency": 500,
+            "requestsSec": 531.24,
+            "p50Ms": 3.76,
+            "p99Ms": 78.02,
+            "errorRate": 6.55952976488244,
+            "nonSuccess": 1049,
+            "totalRequests": 15992.0
+          }
+        ]
+      },
+      "cache_impact": {
+        "concurrency": 100,
+        "frameworks": {
+          "node": {
+            "cold": {
+              "requestsSec": 5088.15,
+              "p50Ms": 13.16,
+              "p99Ms": 1500.0,
+              "errorRate": 0.0
+            },
+            "warm": {
+              "requestsSec": 7209.73,
+              "p50Ms": 10.48,
+              "p99Ms": 38.76,
+              "errorRate": 0.0
+            }
+          },
+          "flask": {
+            "cold": {
+              "requestsSec": 534.39,
+              "p50Ms": 31.52,
+              "p99Ms": 48.69,
+              "errorRate": 0.0
+            },
+            "warm": {
+              "requestsSec": 59.52,
+              "p50Ms": 24.54,
+              "p99Ms": 28.73,
+              "errorRate": 0.0
+            }
+          },
+          "nginx": {
+            "cold": {
+              "requestsSec": 3928.17,
+              "p50Ms": 16.42,
+              "p99Ms": 37.91,
+              "errorRate": 86.10593220338984
+            },
+            "warm": {
+              "requestsSec": 1362.1,
+              "p50Ms": 1.83,
+              "p99Ms": 4.91,
+              "errorRate": 60.421951219512195
+            }
+          },
+          "apache": {
+            "cold": {
+              "requestsSec": 431.63,
+              "p50Ms": 2.87,
+              "p99Ms": 1190.0,
+              "errorRate": 1.5806924203870767
+            },
+            "warm": {
+              "requestsSec": 547.46,
+              "p50Ms": 4.72,
+              "p99Ms": 1190.0,
+              "errorRate": 1.3564476885644767
+            }
+          }
+        }
+      },
+      "error_breakdown": {
+        "node": {
+          "200": 1400,
+          "502": 0,
+          "504": 0,
+          "429": 0,
+          "other": 0
+        },
+        "flask": {
+          "200": 1311,
+          "502": 0,
+          "504": 0,
+          "429": 0,
+          "other": 89
+        },
+        "nginx": {
+          "200": 1144,
+          "502": 2,
+          "504": 0,
+          "429": 0,
+          "other": 254
+        },
+        "apache": {
+          "200": 1257,
+          "502": 0,
+          "504": 0,
+          "429": 0,
+          "other": 143
+        }
+      },
+      "system_metrics": {
+        "node": {
+          "peak_cpu": 0.0,
+          "avg_cpu": 0.0,
+          "peak_memory_mb": 215.78125,
+          "avg_memory_mb": 183.98660714285714
+        },
+        "flask": {
+          "peak_cpu": 0.0,
+          "avg_cpu": 0.0,
+          "peak_memory_mb": 1935.34375,
+          "avg_memory_mb": 1506.0361922888017
+        },
+        "nginx": {
+          "peak_cpu": 0.0,
+          "avg_cpu": 0.0,
+          "peak_memory_mb": 1623.734375,
+          "avg_memory_mb": 1180.016962548638
+        },
+        "apache": {
+          "peak_cpu": 0.0,
+          "avg_cpu": 0.0,
+          "peak_memory_mb": 1604.46875,
+          "avg_memory_mb": 1249.6762835892514
+        }
+      },
+      "graphs": [
+        {
+          "file": "throughput_comparison.png",
+          "title": "Throughput by Framework and Concurrency Level",
+          "url": "/benchmark-graphs/throughput_comparison.png"
+        },
+        {
+          "file": "latency_p50_p99.png",
+          "title": "Latency Distribution (p50 vs p99)",
+          "url": "/benchmark-graphs/latency_p50_p99.png"
+        },
+        {
+          "file": "latency_scaling_curve.png",
+          "title": "How Tail Latency Scales with Concurrency",
+          "url": "/benchmark-graphs/latency_scaling_curve.png"
+        },
+        {
+          "file": "throughput_scaling_curve.png",
+          "title": "Throughput Scaling Curve",
+          "url": "/benchmark-graphs/throughput_scaling_curve.png"
+        },
+        {
+          "file": "error_rate.png",
+          "title": "Error Rate at 500 Concurrent Connections",
+          "url": "/benchmark-graphs/error_rate.png"
+        },
+        {
+          "file": "cache_impact_throughput.png",
+          "title": "Cold vs Warm Cache Throughput",
+          "url": "/benchmark-graphs/cache_impact_throughput.png"
+        },
+        {
+          "file": "cache_impact_latency.png",
+          "title": "Cold vs Warm Cache Tail Latency",
+          "url": "/benchmark-graphs/cache_impact_latency.png"
+        },
+        {
+          "file": "system_cpu.png",
+          "title": "Backend CPU Usage During Benchmark Run",
+          "url": "/benchmark-graphs/system_cpu.png"
+        },
+        {
+          "file": "system_memory.png",
+          "title": "Backend Memory Usage During Benchmark Run",
+          "url": "/benchmark-graphs/system_memory.png"
+        },
+        {
+          "file": "summary_table.png",
+          "title": "RedirectIQ Framework Benchmark Summary",
+          "url": "/benchmark-graphs/summary_table.png"
+        }
+      ]
+    }
   }
 ]
