@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import api, { getApiErrorMessage } from '../api';
+import './Login.css';
 
 function Login() {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ function Login() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const isLoginMode = mode === 'login';
 
   if (localStorage.getItem('redirectiq_token')) {
     return <Navigate to="/dashboard" replace />;
@@ -67,81 +69,106 @@ function Login() {
   }
 
   return (
-    <main className="auth-page">
-      <div className="auth-panel">
-        <div className="auth-panel__intro card auth-story">
-          <div className="eyebrow">Redirect intelligence</div>
-          <h1>Build, guard, and benchmark every short link from one calmer workspace.</h1>
-          <p>
-            Create redirects, lock sensitive destinations, spin up split tests, and watch clicks land
-            in real time.
-          </p>
-          <div className="auth-story__list">
-            <div className="auth-story__item">
-              <strong>4 frameworks</strong>
-              <span>Same RedirectIQ product, benchmarked across Node, Flask, Nginx, and Apache.</span>
-            </div>
-            <div className="auth-story__item">
-              <strong>1 shared schema</strong>
-              <span>Every backend uses the same SQLite shape so the comparison stays honest.</span>
-            </div>
-            <div className="auth-story__item">
-              <strong>Live analytics</strong>
-              <span>Track clicks, inspect traffic sources, and compare throughput from one place.</span>
-            </div>
-          </div>
+    <main className="split-layout">
+      {/* Left Side: 60% Width */}
+      <section className="split-left">
+        <div className="brand-minimal">
+          <svg className="brand-logo-svg" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="12" fill="#111" />
+            <path d="M12 26 C 12 16, 20 16, 20 16 L 28 16" stroke="url(#paint0_linear)" strokeWidth="3.5" strokeLinecap="round" />
+            <path d="M24 12 L 29 16 L 24 20" stroke="#FF4D00" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="12" cy="26" r="3" fill="#FFF" />
+            <defs>
+              <linearGradient id="paint0_linear" x1="12" y1="26" x2="28" y2="16" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#FFF" />
+                <stop offset="1" stopColor="#FF4D00" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <span className="brand-text">RedirectIQ</span>
+        </div>
+        
+        {/* Enriched 3D Glass Sculpture Representation */}
+        <div className="sculpture-container">
+          <div className="glass-sculpture base-layer"></div>
+          <div className="glass-sculpture mid-layer"></div>
+          <div className="glass-sculpture top-layer"></div>
+          
+          {/* Decorative glowing pathways */}
+          <div className="glow-path glow-1"></div>
+          <div className="glow-path glow-2"></div>
         </div>
 
-        <section className="auth-card card">
-          <div className="auth-card__header">
-            <h2>{mode === 'login' ? 'Welcome back' : 'Create your account'}</h2>
-            <p>{mode === 'login' ? 'Sign in to manage your links.' : 'Register to start shortening URLs.'}</p>
-          </div>
+        <div className="hero-copy">
+          <h2>Production URL Routing</h2>
+          <p>Benchmark, manage, and analyze your links with a high-fidelity workspace designed for performance testing.</p>
+        </div>
+      </section>
 
-          <form className="auth-form" onSubmit={handleSubmit}>
-            <label className="field">
-              <span>Email</span>
+      {/* Right Side: 40% Width */}
+      <section className="split-right">
+        <div className="login-card">
+          <div className="login-card-header">
+            <h1>{isLoginMode ? 'Welcome to RedirectIQ' : 'Welcome to RedirectIQ'}</h1>
+          </div>
+          
+
+          {error && <div className="auth-error">{error}</div>}
+
+          <form className="login-form" onSubmit={handleSubmit}>
+            <div className="input-group">
+              <label>Email Address</label>
               <input
                 type="email"
                 name="email"
+                className="minimal-input"
+                placeholder="Enter your email"
                 value={form.email}
                 onChange={handleChange}
-                placeholder="anish@test.com"
+                autoComplete="email"
                 required
               />
-            </label>
+            </div>
 
-            <label className="field">
-              <span>Password</span>
+            <div className="input-group">
+              <label>Password</label>
               <input
                 type="password"
                 name="password"
+                className="minimal-input"
+                placeholder="Enter your password"
                 value={form.password}
                 onChange={handleChange}
-                placeholder="password123"
+                autoComplete={isLoginMode ? 'current-password' : 'new-password'}
                 required
               />
-            </label>
+            </div>
 
-            {error ? <p className="feedback feedback--error">{error}</p> : null}
-
-            <button type="submit" className="button button--full" disabled={loading}>
-              {loading ? 'Working...' : mode === 'login' ? 'Login' : 'Register'}
+            <button type="submit" className="btn-coral" disabled={loading}>
+              {loading ? 'Working...' : isLoginMode ? 'Log In' : 'Register'}
             </button>
           </form>
 
-          <button
-            type="button"
-            className="auth-switch"
-            onClick={function toggleMode() {
-              setMode(mode === 'login' ? 'register' : 'login');
-              setError('');
-            }}
-          >
-            {mode === 'login' ? 'Need an account? Register' : 'Already have an account? Login'}
-          </button>
-        </section>
-      </div>
+          {isLoginMode && (
+            <button type="button" className="forgot-password">
+              Forgot password?
+            </button>
+          )}
+
+          <div className="toggle-mode">
+            {isLoginMode ? "Don't have an account?" : "Already have an account?"}
+            <button
+              type="button"
+              onClick={() => {
+                setMode(isLoginMode ? 'register' : 'login');
+                setError('');
+              }}
+            >
+              {isLoginMode ? 'Sign up' : 'Log In'}
+            </button>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

@@ -1,0 +1,309 @@
+:root {
+  /* Background Mesh (Lavender-Peach) */
+  --bg-gradient: radial-gradient(at 0% 0%, #e0e7ff 0, transparent 50%), 
+                 radial-gradient(at 50% 0%, #ffedd5 0, transparent 50%), 
+                 radial-gradient(at 100% 0%, #ecfdf5 0, transparent 50%);
+  
+  /* Glass Card */
+  --glass-bg: rgba(255, 255, 255, 0.3); /* Low opacity */
+  --glass-border: 1px solid rgba(255, 255, 255, 0.4);
+  --glass-blur: blur(25px);
+  
+  /* Accent Color */
+  --primary-accent: #ff4d00; /* Vibrant Orange */
+}
+
+.split-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-gradient);
+}
+
+.split-left {
+  flex: 0 0 60%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.sculpture-container {
+  position: relative;
+  width: 500px;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  z-index: 10;
+}
+
+/* Enriched simulated 3D isometric element */
+.glass-sculpture {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.05) 70%);
+  border-radius: 40px;
+  transform: rotateX(60deg) rotateZ(45deg);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  transition: transform 0.5s ease;
+}
+
+.base-layer {
+  transform: rotateX(60deg) rotateZ(45deg) translateZ(-40px);
+  box-shadow: 0 40px 100px rgba(100, 150, 255, 0.2);
+}
+
+.mid-layer {
+  width: 240px;
+  height: 240px;
+  transform: rotateX(60deg) rotateZ(45deg) translateZ(20px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.6), transparent);
+}
+
+.top-layer {
+  width: 160px;
+  height: 160px;
+  transform: rotateX(60deg) rotateZ(45deg) translateZ(80px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.1));
+}
+
+/* Glowing Pathways to simulate a "Node" */
+.glow-path {
+  position: absolute;
+  background: linear-gradient(90deg, transparent, rgba(255, 77, 0, 0.8), transparent);
+  border-radius: 10px;
+  filter: blur(2px);
+  opacity: 0.7;
+}
+
+.glow-1 {
+  width: 200px;
+  height: 4px;
+  top: 50%;
+  left: -20%;
+  transform: rotate(-30deg);
+}
+
+.glow-2 {
+  width: 180px;
+  height: 4px;
+  bottom: 20%;
+  right: -10%;
+  transform: rotate(40deg);
+  background: linear-gradient(90deg, transparent, rgba(100, 150, 255, 0.8), transparent);
+}
+
+/* Bottom Copy */
+.hero-copy {
+  margin-top: 40px;
+  text-align: center;
+  max-width: 480px;
+  color: #333;
+  z-index: 20;
+}
+
+.hero-copy h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.hero-copy p {
+  font-size: 1rem;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+.brand-minimal {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  color: #111;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 20;
+}
+
+.brand-text {
+  background: linear-gradient(90deg, #111, #444);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-logo-svg {
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}
+
+.split-right {
+  flex: 0 0 40%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 40px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 480px;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: 32px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+}
+
+.login-card-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.login-card h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.minimal-input {
+  width: 100%;
+  padding: 22px 24px;
+  font-size: 1rem;
+  color: #111;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  outline: none;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  box-sizing: border-box;
+}
+
+.minimal-input:focus {
+  border-color: var(--primary-accent);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 0 4px rgba(255, 77, 0, 0.1);
+}
+
+.minimal-input::placeholder {
+  color: #888;
+}
+
+.btn-coral {
+  margin-top: 16px;
+  width: 100%;
+  padding: 22px;
+  background-color: var(--primary-accent);
+  color: #fff;
+  font-size: 1.125rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: inset 0 4px 10px rgba(255, 255, 255, 0.2), 0 8px 20px rgba(255, 77, 0, 0.3);
+}
+
+.btn-coral:hover {
+  background-color: #e64500;
+}
+
+.btn-coral:active {
+  transform: scale(0.98);
+}
+
+.btn-coral:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.forgot-password {
+  display: block;
+  margin-top: 16px;
+  text-align: center;
+  color: #666;
+  font-size: 0.875rem;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.forgot-password:hover {
+  color: #111;
+}
+
+.auth-error {
+  color: #d32f2f;
+  background: rgba(211, 47, 47, 0.1);
+  padding: 16px;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  margin-bottom: 24px;
+  border: 1px solid rgba(211, 47, 47, 0.2);
+}
+
+
+.toggle-mode {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.toggle-mode button {
+  background: none;
+  border: none;
+  color: var(--primary-accent);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.toggle-mode button:hover {
+  text-decoration: underline;
+}
