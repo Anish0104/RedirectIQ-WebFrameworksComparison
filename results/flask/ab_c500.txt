@@ -20,35 +20,35 @@ Server Software:        gunicorn
 Server Hostname:        127.0.0.1
 Server Port:            3002
 
-Document Path:          /59eb245
+Document Path:          /01e6b7d
 Document Length:        225 bytes
 
 Concurrency Level:      500
-Time taken for tests:   0.300 seconds
+Time taken for tests:   0.261 seconds
 Complete requests:      1000
 Failed requests:        0
 Non-2xx responses:      1000
-Total transferred:      601004 bytes
+Total transferred:      601000 bytes
 HTML transferred:       225000 bytes
-Requests per second:    3331.62 [#/sec] (mean)
-Time per request:       150.077 [ms] (mean)
-Time per request:       0.300 [ms] (mean, across all concurrent requests)
-Transfer rate:          1955.39 [Kbytes/sec] received
+Requests per second:    3834.83 [#/sec] (mean)
+Time per request:       130.384 [ms] (mean)
+Time per request:       0.261 [ms] (mean, across all concurrent requests)
+Transfer rate:          2250.71 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0   14  46.0      0     226
-Processing:    12   35   5.7     34      49
-Waiting:        3   34   5.7     33      48
-Total:         17   49  45.7     38     263
+Connect:        0    6  17.5      0     210
+Processing:     2   30   5.9     29      46
+Waiting:        2   29   5.9     29      46
+Total:         14   35  18.3     29     241
 
 Percentage of the requests served within a certain time (ms)
-  50%     38
-  66%     40
-  75%     41
-  80%     43
-  90%     63
-  95%    124
-  98%    258
-  99%    261
- 100%    263 (longest request)
+  50%     29
+  66%     31
+  75%     32
+  80%     38
+  90%     54
+  95%     60
+  98%     90
+  99%    120
+ 100%    241 (longest request)
