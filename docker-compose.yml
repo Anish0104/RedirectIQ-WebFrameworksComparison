@@ -2,8 +2,7 @@ services:
   node-express:
     build:
       context: ./node-express
-    env_file:
-      - ./node-express/.env
+    restart: unless-stopped
     ports:
       - "3001:3001"
     volumes:
@@ -14,8 +13,7 @@ services:
   python-flask:
     build:
       context: ./python-flask
-    env_file:
-      - ./python-flask/.env
+    restart: unless-stopped
     ports:
       - "3002:3002"
     volumes:
@@ -26,8 +24,7 @@ services:
   nginx-proxy:
     build:
       context: ./nginx-proxy
-    env_file:
-      - ./nginx-proxy/.env
+    restart: unless-stopped
     ports:
       - "3003:3003"
     volumes:
@@ -38,8 +35,7 @@ services:
   apache-proxy:
     build:
       context: ./apache-proxy
-    env_file:
-      - ./apache-proxy/.env
+    restart: unless-stopped
     ports:
       - "3004:3004"
     volumes:
@@ -50,11 +46,9 @@ services:
   frontend:
     build:
       context: ./frontend
+    restart: unless-stopped
     ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - "80:80"
     depends_on:
       - node-express
       - python-flask
