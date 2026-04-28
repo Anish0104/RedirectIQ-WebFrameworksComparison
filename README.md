@@ -142,3 +142,6 @@ docker compose up
 ```
 
 Then open `http://localhost:5173`
+
+---
+Built for the RedirectIQ Web Frameworks Comparison Suite.
