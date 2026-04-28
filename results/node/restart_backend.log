@@ -1,0 +1,5 @@
+
+> redirectiq@1.0.0 start
+> node src/server.js
+
+RedirectIQ listening on 0.0.0.0:3001

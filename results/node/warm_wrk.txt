@@ -1,0 +1,13 @@
+Running 30s test @ http://127.0.0.1:3001/a7190ca
+  4 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    14.55ms   11.79ms 404.66ms   95.81%
+    Req/Sec     1.81k   203.16     2.43k    74.06%
+  Latency Distribution
+     50%   10.48ms
+     75%   18.36ms
+     90%   20.54ms
+     99%   38.76ms
+  217036 requests in 30.10s, 77.83MB read
+Requests/sec:   7209.73
+Transfer/sec:      2.59MB

@@ -20,35 +20,35 @@ Server Software:
 Server Hostname:        127.0.0.1
 Server Port:            3001
 
-Document Path:          /041c285
+Document Path:          /a7190ca
 Document Length:        41 bytes
 
 Concurrency Level:      250
-Time taken for tests:   0.196 seconds
+Time taken for tests:   0.226 seconds
 Complete requests:      1000
 Failed requests:        0
 Non-2xx responses:      1000
 Total transferred:      348000 bytes
 HTML transferred:       41000 bytes
-Requests per second:    5094.14 [#/sec] (mean)
-Time per request:       49.076 [ms] (mean)
-Time per request:       0.196 [ms] (mean, across all concurrent requests)
-Transfer rate:          1731.21 [Kbytes/sec] received
+Requests per second:    4424.97 [#/sec] (mean)
+Time per request:       56.498 [ms] (mean)
+Time per request:       0.226 [ms] (mean, across all concurrent requests)
+Transfer rate:          1503.80 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0    5  15.5      0     124
-Processing:     4   25   8.8     26      45
-Waiting:        0   25   8.7     26      44
-Total:          4   30  16.9     27     152
+Connect:        0    2   9.1      0     154
+Processing:     5   28  12.3     22      60
+Waiting:        1   27  13.1     22      60
+Total:          6   30  15.0     32     186
 
 Percentage of the requests served within a certain time (ms)
-  50%     27
-  66%     29
+  50%     32
+  66%     33
   75%     35
-  80%     39
-  90%     44
-  95%     80
-  98%     83
-  99%     85
- 100%    152 (longest request)
+  80%     36
+  90%     54
+  95%     58
+  98%     60
+  99%     62
+ 100%    186 (longest request)
