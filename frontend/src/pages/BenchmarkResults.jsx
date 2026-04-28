@@ -13,7 +13,7 @@ import {
   XAxis,
   YAxis
 } from 'recharts';
-import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
 
 const FRAMEWORK_LABELS = {
   node: 'Node',
@@ -1215,19 +1215,20 @@ function BenchmarkResults() {
   const historyDeltaRows = hasData ? buildHistoryDeltaRows(summary, selectedComparisonRun) : [];
 
   return (
-    <div className="page-shell">
-      <Navbar />
+    <main className="dashboard-page">
+      <div className="dashboard-shell">
+        <Sidebar loading={healthLoading} />
 
-      <main className="page-content">
-        <section className="results-hero card">
-          <div>
-            <div className="eyebrow">Benchmark center</div>
-            <h1>Compare the four RedirectIQ stacks under the same load.</h1>
-            <p>
-              Run the suite once, generate the analyzer output, and this page updates with winners,
-              summaries, and charts from the saved benchmark files.
-            </p>
-          </div>
+        <section className="dashboard-stage">
+          <header className="dashboard-stage__header glass-surface">
+            <div>
+              <div className="dashboard-kicker">Benchmark center</div>
+              <h1>Compare the four RedirectIQ stacks under the same load.</h1>
+              <p>
+                Run the suite once, generate the analyzer output, and this page updates with winners,
+                summaries, and charts from the saved benchmark files.
+              </p>
+            </div>
           <div className="results-hero__actions">
             <Link to="/dashboard" className="button button--ghost">
               Back to Dashboard
@@ -1245,7 +1246,7 @@ function BenchmarkResults() {
               Open Summary JSON
             </a>
           </div>
-        </section>
+        </header>
 
         {copyFeedback ? <p className="inline-feedback">{copyFeedback}</p> : null}
         {summaryNotice ? <p className="inline-feedback inline-feedback--soft">{summaryNotice}</p> : null}
@@ -1335,40 +1336,6 @@ function BenchmarkResults() {
           </section>
         ) : (
           <>
-            <section className="results-support-grid">
-              <article className="card support-card">
-                <div className="section-card__header">
-                  <div>
-                    <h2>Target health</h2>
-                    <p>Quick visibility into the four benchmark backends.</p>
-                  </div>
-                </div>
-                <div className="support-pill-row">
-                  {backendHealth.map(function renderTargetPill(target) {
-                    return (
-                      <div key={target.id} className={`support-pill support-pill--${target.status}`}>
-                        <span>{target.label}</span>
-                        <strong>{target.status}</strong>
-                      </div>
-                    );
-                  })}
-                </div>
-              </article>
-
-              <article className="card support-card">
-                <div className="section-card__header">
-                  <div>
-                    <h2>Quick runbook</h2>
-                    <p>Rerun the suite or open the machine-readable summary without leaving this page.</p>
-                  </div>
-                </div>
-                <div className="benchmark-panel__actions">
-                  <code>bash benchmark/run_bench.sh</code>
-                  <code>python3 benchmark/analyze.py</code>
-                </div>
-              </article>
-            </section>
-
             <section className="winner-grid">
               <WinnerCard
                 label="Overall winner"
@@ -1791,8 +1758,62 @@ function BenchmarkResults() {
             </section>
           </>
         ) : null}
-      </main>
-    </div>
+        </section>
+
+        <aside className="dashboard-activity glass-surface">
+          <div className="dashboard-activity__header">
+            <div>
+              <div className="dashboard-kicker">Live Diagnostics</div>
+              <h2>Backend Status</h2>
+            </div>
+            <div className={`dashboard-activity__status ${healthLoading ? 'checking' : 'live'}`}>
+              {healthLoading ? 'Checking...' : 'Live'}
+            </div>
+          </div>
+
+          <div className="dashboard-activity__feed">
+            <div className="support-sidebar-grid">
+              {backendHealth.map(function renderTargetPill(target) {
+                return (
+                  <div key={target.id} className={`support-pill support-pill--${target.status}`}>
+                    <span>{target.label}</span>
+                    <strong>{target.status}</strong>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="dashboard-activity__header" style={{ marginTop: '24px' }}>
+            <div>
+              <div className="dashboard-kicker">Automation</div>
+              <h2>Quick Runbook</h2>
+            </div>
+          </div>
+          <div className="benchmark-panel__actions" style={{ padding: '0 20px' }}>
+            <code>bash benchmark/run_bench.sh</code>
+            <code>python3 benchmark/analyze.py</code>
+          </div>
+
+          <div className="dashboard-activity__header" style={{ marginTop: '32px' }}>
+            <div>
+              <div className="dashboard-kicker">Performance Insights</div>
+              <h2>Why {summary.winners?.overall?.framework ? getFrameworkLabel(summary.winners.overall.framework) : 'Node'} wins?</h2>
+            </div>
+          </div>
+          <div className="qualitative-explanation-rail">
+            <p>
+              <strong>Event Loop Efficiency:</strong> Node handles massive concurrency (c500) without 
+              dropping connections by queuing them in the event loop.
+            </p>
+            <p style={{ marginTop: '12px' }}>
+              <strong>Zero-Copy I/O:</strong> Nginx and Apache incur overhead from proxying 
+              between layers, while the Node stack executes logic in a single process.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </main>
   );
 }
 
