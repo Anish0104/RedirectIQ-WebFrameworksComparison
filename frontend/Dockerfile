@@ -1,3 +1,5 @@
+# Production Dockerfile for RedirectIQ Frontend
+
 FROM node:20-bookworm
 
 WORKDIR /app
