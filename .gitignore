@@ -1,2 +1,4 @@
 # Core Ignore Rules
 .DS_Store
+node_modules/
+.venv/
